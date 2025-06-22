@@ -1,0 +1,6 @@
+export { default as ChannelHero } from './ChannelHero'
+export { default as FeaturedVideos } from './FeaturedVideos'
+export { default as PlaylistsSection } from './PlaylistsSection'
+export { default as AboutSection } from './AboutSection'
+export { default as ChannelCta } from './ChannelCta'
+export { default as ContactSection } from './ContactSection'

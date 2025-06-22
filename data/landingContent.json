@@ -1,0 +1,294 @@
+{
+  "hero": {
+    "title": "ALLSET Template: AI-Powered Landing Pages",
+    "image": "/placeholder.jpg",
+    "description": "Launch professional, high-converting landing pages in minutes—no design or technical skills required. Completely free to download!",
+    "primaryCta": {
+      "text": "Download Now (Free)",
+      "link": "#cta"
+    },
+    "secondaryCta": {
+      "text": "Learn More",
+      "link": "#features"
+    }
+  },
+  "services": {
+    "title": "Key Benefits of ALLSET Template",
+    "description": "Unlock the power of AI to revolutionize your landing page creation process.",
+    "items": [
+      {
+        "title": "AI-Powered Content Generation",
+        "description": "Let our AI create compelling features, FAQs, testimonials, and more, tailored to your business.",
+        "icon": "FaIndustry",
+        "image": "/placeholder.jpg"
+      },
+      {
+        "title": "SEO Blog Generator",
+        "description": "Boost your search engine rankings with AI-generated blog posts, driving organic traffic to your site.",
+        "icon": "FaTools",
+        "image": "/placeholder.jpg"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Landing Page Templates",
+    "description": "Explore our range of professionally designed templates to suit your specific business needs.",
+    "items": [
+      {
+        "title": "E-commerce Template",
+        "description": "Showcase your products and drive sales with a visually appealing and conversion-optimized e-commerce landing page.",
+        "image": "/placeholder.jpg",
+        "category": "E-commerce",
+        "completionDate": "October 2024"
+      }
+    ]
+  },
+  "mainFeatures": {
+    "title": "Main Features",
+    "description": "ALLSET Template's AI-driven power at your fingertips.",
+    "items": [
+      {
+        "id": 1,
+        "icon": "FaBolt",
+        "title": "Instant Content Creation",
+        "description": "Generate all the essential landing page content in seconds.",
+        "image": "/static/images/feat1.jpg"
+      },
+      {
+        "id": 2,
+        "icon": "FaShieldAlt",
+        "title": "SEO Optimization",
+        "description": "Attract more organic traffic with SEO-optimized content.",
+        "image": "/static/images/feat2.jpg"
+      },
+      {
+        "id": 3,
+        "icon": "FaShieldAlt",
+        "title": "Professional Results",
+        "description": "Get landing pages that are visually appealing, optimized for conversions, and ready to attract customers.",
+        "image": "/static/images/feat3.jpg"
+      }
+    ]
+  },
+  "features": {
+    "title": "More Features",
+    "description": "Explore the features that make ALLSET Template the best choice for your landing page needs.",
+    "items": [
+      {
+        "title": "5 Professional Templates",
+        "description": "Choose from five beautifully designed, ready-to-use layouts.",
+        "icon": "FiUsers"
+      },
+      {
+        "title": "Mobile-Responsive Design",
+        "description": "Ensure your landing pages look great on any device.",
+        "icon": "FiSmartphone"
+      },
+      {
+        "title": "Customizable Templates",
+        "description": "Easily modify the templates to match your brand.",
+        "icon": "FiEdit"
+      },
+      {
+        "title": "Free to Use",
+        "description": "ALLSET Template is completely free to download and use.",
+        "icon": "FiEdit"
+      },
+      {
+        "title": "No Design or Technical Skills Required",
+        "description": "ALLSET Template is designed to be user-friendly, even if you have zero technical experience. Our AI generates all the necessary content, and our templates are easy to customize.",
+        "icon": "FiEdit"
+      },
+      {
+        "title": "Time-Saving Automation",
+        "description": "Focus on your business, not building landing pages.",
+        "icon": "FiEdit"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Launch Your Landing Page?",
+    "description": "Download ALLSET Template for free and start building today!",
+    "button": {
+      "text": "Download Now (Free)",
+      "link": "#"
+    },
+    "collectEmail": true
+  },
+  "stats": {
+    "title": "Trusted by Businesses Worldwide",
+    "description": "Join our growing community of satisfied users.",
+    "items": [
+      {
+        "value": "95%",
+        "label": "User Satisfaction"
+      },
+      {
+        "value": "5",
+        "label": "Professional Templates"
+      },
+      {
+        "value": "1K+",
+        "label": "Downloads"
+      },
+      {
+        "value": "2+",
+        "label": "AI based features"
+      }
+    ]
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "description": "Everything you need to know about ALLSET Template.",
+    "questions": [
+      {
+        "question": "Is ALLSET Template really free?",
+        "answer": "Yes! You can download and use ALLSET Template completely free of charge. Simply provide your email address to get started."
+      },
+      {
+        "question": "Can you create a custom solution for my specific needs?",
+        "answer": "Absolutely! If you need a tailored solution that goes beyond our standard templates, our team can build a custom solution specifically for your requirements. Contact us to discuss your project and get a quote."
+      },
+      {
+        "question": "Do I need any design or technical skills to use ALLSET Template?",
+        "answer": "No, ALLSET Template is designed to be user-friendly, even if you have zero technical experience. Our AI generates all the necessary content, and our templates are easy to customize."
+      },
+      {
+        "question": "How does the AI content generation work?",
+        "answer": "Simply describe your business or product, and our AI will instantly create all the essential content for your landing page, including features, FAQs, testimonials, and calls to action."
+      },
+      {
+        "question": "Can I customize the templates and AI-generated content?",
+        "answer": "Yes, you have full control over your landing page. You can easily customize the templates, edit the AI-generated content, and add your own branding."
+      },
+      {
+        "question": "What kind of support do you offer?",
+        "answer": "We offer email support to help you get the most out of ALLSET Template. We're also constantly improving our platform based on user feedback."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Pricing (No Cost)",
+    "description": "ALLSET Template is free to download. Future premium features may be available.",
+    "plans": [
+      {
+        "name": "Free",
+        "price": "$0",
+        "description": "Get started with ALLSET Template for free!",
+        "features": [
+          {
+            "text": "5 Professional Templates"
+          },
+          {
+            "text": "AI-Powered Content Generation"
+          },
+          {
+            "text": "SEO Blog Generator"
+          }
+        ],
+        "cta": {
+          "text": "Download Now",
+          "link": "#cta"
+        },
+        "highlighted": true
+      },
+      {
+        "name": "Premium (Coming Soon)",
+        "price": "TBD",
+        "description": "Unlock advanced features and priority support.",
+        "features": [
+          {
+            "text": "All Free features"
+          },
+          {
+            "text": "Advanced Analytics"
+          },
+          {
+            "text": "A/B Testing"
+          },
+          {
+            "text": "AI Customer Service Agent"
+          },
+          {
+            "text": "Enhanced Blog Generation with Smart Images"
+          },
+          {
+            "text": "Priority Support"
+          }
+        ],
+        "cta": {
+          "text": "Join Waitlist",
+          "link": "#cta"
+        }
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Have questions? Get in touch with our team.",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Name",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true
+      },
+      {
+        "name": "message",
+        "label": "Message",
+        "type": "textarea",
+        "required": false
+      }
+    ],
+    "submitLabel": "Send Message",
+    "successMessage": "Thank you for your message! We'll be in touch soon.",
+    "contactInfo": {
+      "title": "Contact Information",
+      "phone": {
+        "label": "Phone",
+        "number": "",
+        "hours": ""
+      },
+      "email": {
+        "label": "Email",
+        "address": "contact@allset-template.online",
+        "responseTime": "24 hours"
+      },
+      "location": {
+        "label": "Location",
+        "address": ["Online", "Worldwide"]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What Our Users Are Saying",
+    "description": "Read testimonials from businesses that have transformed their landing pages with ALLSET Template.",
+    "image": "/placeholder.jpg",
+    "testimonials": [
+      {
+        "name": "Ralph Nault",
+        "title": "Software Engineer",
+        "quote": "The blog posts generated by ALLSET Template are so engaging and informative that our website traffic has skyrocketed.",
+        "image": "/static/images/testimonial1.jpg"
+      },
+      {
+        "name": "Jazmin Salinas",
+        "title": "Marketing Manager",
+        "quote": "ALLSET Template has saved us so much time and money. Our landing pages are now more effective than ever!",
+        "image": "/static/images/testimonial2.jpg"
+      },
+      {
+        "name": "Emily Davis",
+        "title": "Marketing Manager",
+        "quote": "ALLSET Template has been a lifesaver for our marketing team. It has helped us create professional landing pages in minutes.",
+        "image": "/static/images/testimonial3.jpg"
+      }
+    ]
+  }
+}

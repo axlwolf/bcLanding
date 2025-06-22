@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{subject}}</title>
+  <style>
+    /* Add your responsive email styles here */
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; padding: 20px 0; border-bottom: 1px solid #eee; }
+    .content { padding: 20px 0; }
+    .footer { text-align: center; padding: 20px 0; color: #666; font-size: 12px; border-top: 1px solid #eee; }
+    .button {
+      display: inline-block; 
+      padding: 10px 20px; 
+      background-color: #2563eb; 
+      color: white; 
+      text-decoration: none; 
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{siteName}}</h1>
+    </div>
+    <div class="content">
+      {{{body}}}
+    </div>
+    <div class="footer">
+      <p>&copy; {{currentYear}} {{siteName}}. All rights reserved.</p>
+      {{#if unsubscribeUrl}}
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a> from these emails.</p>
+      {{/if}}
+    </div>
+  </div>
+</body>
+</html>

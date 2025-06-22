@@ -1,0 +1,105 @@
+{
+  "activeTemplate": "Main5",
+  "availableTemplates": [
+    {
+      "id": "Main",
+      "name": "Classic Business Template",
+      "description": "A professional layout with centered hero section, feature cards, and a clean blog display. Perfect for corporate sites and service businesses.",
+      "image": "/static/images/templates/template-main.jpg",
+      "elements": [
+        "Centered hero section with CTA buttons",
+        "Feature cards with icons",
+        "Product demo section with image",
+        "Recent blog posts in list format",
+        "Newsletter signup"
+      ],
+      "colors": "Primary color with white background"
+    },
+    {
+      "id": "Main2",
+      "name": "Modern Dashboard Template",
+      "description": "A contemporary layout with a full-width hero image, grid-based features, and card-style blog posts. Ideal for startups and tech companies.",
+      "image": "/static/images/templates/template-main2.jpg",
+      "elements": [
+        "Full-width hero with side image",
+        "Grid-based feature cards",
+        "Card-style blog posts",
+        "Prominent CTA section",
+        "Colorful icon set"
+      ],
+      "colors": "Gradient accents with light/dark sections"
+    },
+    {
+      "id": "Main3",
+      "name": "Modern Business Template",
+      "description": "A contemporary layout with a full-width hero image, grid-based features, and card-style blog posts. Ideal for startups and tech companies.",
+      "image": "/static/images/templates/template-main3.jpg",
+      "elements": [
+        "Full-width hero with side image",
+        "Grid-based feature cards",
+        "Card-style blog posts",
+        "Prominent CTA section",
+        "Colorful icon set"
+      ],
+      "colors": "Gradient accents with light/dark sections"
+    },
+    {
+      "id": "Main4",
+      "name": "Animated Service Business Template",
+      "description": "A sleek, animated layout designed for service businesses like electrical contractors, plumbing, construction, and similar trades. Features fluid transitions and modern UI elements that showcase professionalism while engaging potential clients.",
+      "image": "/static/images/templates/template-main4.jpg",
+      "elements": [
+        "Animated hero section with smooth transitions",
+        "Staggered reveal animations for content sections",
+        "Interactive service cards with hover effects",
+        "Animated testimonials with profile images",
+        "Expandable FAQ accordion with smooth animations"
+      ],
+      "colors": "Customizable with built-in dark mode support"
+    },
+    {
+      "id": "Main5",
+      "name": "Modern Business Template",
+      "description": "A comprehensive business template featuring smooth animations, a modern hero section, interactive statistics counters, feature highlights with hover effects, app showcase, testimonials, pricing tables with hover states, and an animated FAQ section. Perfect for SaaS companies and digital products looking to impress with fluid motion and interactive elements.",
+      "image": "/static/images/templates/template-main5.jpg",
+      "animations": [
+        "Fade-in on scroll",
+        "Staggered list animations",
+        "Interactive hover effects",
+        "Smooth scroll behavior",
+        "Animated counters",
+        "Section entrance transitions"
+      ],
+      "elements": [
+        "Hero section with main features",
+        "Statistics counter section",
+        "Main features with icons and descriptions",
+        "App showcase section",
+        "Detailed feature highlights",
+        "Customer testimonials",
+        "Pricing tables",
+        "Call-to-action section",
+        "FAQ section with collapsible items"
+      ],
+      "colors": "Dark/light theme with gradient accents"
+    },
+    {
+      "id": "Main6",
+      "name": "YouTube Channel Template",
+      "description": "A YouTube channel template featuring a modern hero section, featured videos, playlists, about section, channel CTA, and contact section. Perfect for YouTube channels looking to showcase their content and engage with their audience.",
+      "image": "/static/images/templates/template-main6.jpg",
+      "elements": [
+        "Hero section with main features",
+        "Statistics counter section",
+        "Main features with icons and descriptions",
+        "App showcase section",
+        "Detailed feature highlights",
+        "Customer testimonials",
+        "Pricing tables",
+        "Call-to-action section",
+        "FAQ section with collapsible items"
+      ],
+      "colors": "Dark/light theme with gradient accents"
+    }
+  ]
+}

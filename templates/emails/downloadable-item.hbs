@@ -1,0 +1,67 @@
+{{!< layouts/base}}
+
+<p>Hello {{name}},</p>
+
+<p>Thank you for subscribing to {{siteName}}! As promised, here's your exclusive <strong>{{itemName}}</strong>.</p>
+
+{{#if itemDescription}}
+  <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #2563eb; margin: 15px 0;">
+    <h3>About This Item:</h3>
+    <p>{{itemDescription}}</p>
+  </div>
+{{/if}}
+
+<div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 20px; text-align: center; margin: 20px 0;">
+  <h2>Your Download is Ready!</h2>
+  <p>Click the button below to download your <strong>{{itemName}}</strong>.</p>
+  
+  {{#if itemPreview}}
+    <div style="margin: 15px 0;">
+      <img src="{{itemPreview}}" alt="{{itemName}} Preview" style="max-width: 300px; height: auto; border: 1px solid #ddd;" />
+    </div>
+  {{/if}}
+  
+  <div style="margin: 20px 0;">
+    <a href="{{downloadUrl}}" class="button" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+      Download {{itemType}}
+    </a>
+  </div>
+  
+  {{#if fileInfo}}
+    <div style="background-color: white; border: 1px dashed #94a3b8; border-radius: 4px; padding: 10px; margin: 15px auto; max-width: 400px; text-align: left;">
+      <div style="font-weight: bold; margin-bottom: 5px;">File Information:</div>
+      <div style="font-size: 13px; color: #475569;">
+        <div><strong>Format:</strong> {{fileInfo.format}}</div>
+        <div><strong>Size:</strong> {{fileInfo.size}}</div>
+        {{#if fileInfo.instructions}}
+          <div style="margin-top: 8px;">
+            <strong>Instructions:</strong> {{fileInfo.instructions}}
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  {{/if}}
+  
+  {{#if expiryNotice}}
+    <p style="font-size: 12px; margin-top: 10px; color: #666;">
+      {{expiryNotice}}
+    </p>
+  {{/if}}
+</div>
+
+{{#if additionalContent}}
+  <div style="margin: 20px 0;">
+    {{{additionalContent}}}
+  </div>
+{{/if}}
+
+<p>If you have any trouble with the download, just reply to this email and we'll help you out.</p>
+
+<p>Enjoy your {{itemType}}!<br>The {{siteName}} Team</p>
+
+{{#if unsubscribeUrl}}
+  <p style="font-size: 12px; color: #666; margin-top: 30px;">
+    Don't want to receive these emails?
+    <a href="{{unsubscribeUrl}}" style="color: #3b82f6;">Unsubscribe here</a>.
+  </p>
+{{/if}}

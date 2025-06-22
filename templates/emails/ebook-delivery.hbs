@@ -1,0 +1,48 @@
+{{!< layouts/base}}
+
+<p>Hello {{name}},</p>
+
+<p>Thank you for your interest in our <strong>{{ebookTitle}}</strong>! As promised, here's your free copy.</p>
+
+{{#if ebookDescription}}
+  <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #2563eb; margin: 15px 0;">
+    <h3>About This Ebook:</h3>
+    <p>{{ebookDescription}}</p>
+  </div>
+{{/if}}
+
+<div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 20px; text-align: center; margin: 20px 0;">
+  <h2>Your Ebook is Ready!</h2>
+  <p>Click the button below to download your copy of <strong>{{ebookTitle}}</strong>.</p>
+  
+  {{#if ebookCover}}
+    <div style="margin: 15px 0;">
+      <img src="{{ebookCover}}" alt="{{ebookTitle}}" style="max-width: 200px; height: auto; border: 1px solid #ddd;" />
+    </div>
+  {{/if}}
+  
+  <a href="{{downloadUrl}}" class="button">Download {{ebookTitle}}</a>
+  
+  {{#if expiryNotice}}
+    <p style="font-size: 12px; margin-top: 10px; color: #666;">
+      {{expiryNotice}}
+    </p>
+  {{/if}}
+</div>
+
+{{#if additionalContent}}
+  <div style="margin: 20px 0;">
+    {{{additionalContent}}}
+  </div>
+{{/if}}
+
+<p>If you have any trouble with the download, just reply to this email and we'll help you out.</p>
+
+<p>Happy reading!<br>The {{siteName}} Team</p>
+
+{{#if unsubscribeUrl}}
+  <p style="font-size: 12px; color: #666; margin-top: 30px;">
+    Don't want to receive these emails?
+    <a href="{{unsubscribeUrl}}">Unsubscribe here</a>.
+  </p>
+{{/if}}
