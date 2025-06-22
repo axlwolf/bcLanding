@@ -1,11 +1,14 @@
 // Animation variants for staggered animations
 export const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
+    y: 0,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
+      staggerChildren: 0.2,
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 20,
     },
   },
 }
@@ -20,11 +23,36 @@ export const staggerContainer = {
   },
 }
 
-export const fadeIn = (direction: string, type: string, delay: number, duration: number) => {
+export const fadeIn = (
+  direction = 'up',
+  type: 'tween' | 'spring' | 'inertia' | 'keyframes' = 'spring',
+  delay = 0,
+  duration = 0.6
+) => {
+  let x = 0
+  let y = 0
+
+  switch (direction) {
+    case 'left':
+      x = 100
+      break
+    case 'right':
+      x = -100
+      break
+    case 'up':
+      y = 100
+      break
+    case 'down':
+      y = -100
+      break
+    default:
+      break
+  }
+
   return {
     hidden: {
-      x: direction === 'left' ? 100 : direction === 'right' ? -100 : 0,
-      y: direction === 'up' ? 100 : direction === 'down' ? -100 : 0,
+      x,
+      y,
       opacity: 0,
     },
     show: {
@@ -35,21 +63,21 @@ export const fadeIn = (direction: string, type: string, delay: number, duration:
         type,
         delay,
         duration,
-        ease: 'easeOut',
+        ease: 'easeInOut' as const,
       },
     },
   }
 }
 
 export const itemVariants = {
-  hidden: { y: 30, opacity: 0 },
+  hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
-      stiffness: 100,
-      damping: 15,
+      type: 'spring' as const,
+      stiffness: 120,
+      damping: 20,
     },
   },
 }
@@ -61,7 +89,7 @@ export const fadeInUpVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
+      ease: 'easeOut' as const,
     },
   },
 }
