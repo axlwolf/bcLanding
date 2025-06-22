@@ -270,4 +270,132 @@ For production, restrict access as needed.
 
 If you add more tables, follow this pattern for each new table.
 
-[Purchase a License](https://imzodev.com/purchase)
+## Actualización: Gestión de Posts y Generador de Títulos (junio 2025)
+
+### Nueva página de gestión de posts
+
+- Se ha añadido la página `/allset/posts` para la gestión de entradas de blog.
+- Permite ver, editar, eliminar y crear nuevos posts desde una interfaz amigable.
+- Incluye confirmación visual y mensajes de éxito/error al eliminar posts.
+- El borrado de posts se realiza mediante una llamada a `/api/allset/posts/delete`.
+
+### Generador de títulos de blog
+
+- Se integra el componente `BlogTitleGenerator` en la página de gestión de posts.
+- Permite generar títulos sugeridos para nuevas entradas de blog usando IA.
+
+### Rutas relevantes
+
+- `/allset/posts` — Listado y gestión de posts.
+- `/allset/posts/new` — Crear nuevo post.
+- `/allset/posts/edit?slug=...` — Editar post existente.
+
+# Guía de Deployment en Vercel
+
+## Pasos para deployar tu aplicación en Vercel
+
+### 1. Crear cuenta en Vercel
+
+- Ve a [vercel.com](https://vercel.com)
+- Regístrate con tu cuenta de GitHub
+
+### 2. Importar tu proyecto
+
+- En el dashboard de Vercel, haz clic en "New Project"
+- Selecciona "Import Git Repository"
+- Busca y selecciona tu repositorio `bcLanding`
+- Haz clic en "Import"
+
+### 3. Configurar variables de entorno
+
+En la sección "Environment Variables" de Vercel, agrega estas variables:
+
+#### Variables obligatorias:
+
+```
+ADMIN_USERNAME=tu_usuario_admin
+ADMIN_PASSWORD=tu_password_admin
+LLM_API_PROVIDER=openai
+LLM_API_KEY=tu_api_key_de_openai
+LLM_MODEL=gpt-3.5-turbo
+EMAIL_HOST=smtp.zoho.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=tu@email.com
+EMAIL_PASSWORD=tu_password_de_email
+EMAIL_FROM_EMAIL=tu@email.com
+EMAIL_FROM_NAME=Tu Nombre
+NEXT_PUBLIC_SITE_URL=https://tu-sitio.vercel.app
+NEXT_PUBLIC_SITE_NAME=Tu Sitio
+DB_PROVIDER=sqlite
+```
+
+#### Variables opcionales (para newsletters):
+
+```
+BUTTONDOWN_API_KEY=tu_buttondown_key
+# O si usas otra plataforma de newsletter:
+MAILCHIMP_API_KEY=tu_mailchimp_key
+MAILCHIMP_API_SERVER=tu_servidor
+MAILCHIMP_AUDIENCE_ID=tu_audience_id
+```
+
+### 4. Configuración de build
+
+Vercel detectará automáticamente que es un proyecto Next.js y usará:
+
+- **Build Command**: `npm run build`
+- **Output Directory**: `.next`
+- **Install Command**: `npm install`
+
+### 5. Deploy
+
+- Haz clic en "Deploy"
+- Vercel construirá y desplegará tu aplicación
+- Recibirás una URL como `https://bc-landing-123.vercel.app`
+
+### 6. Configurar dominio personalizado (opcional)
+
+- En el dashboard del proyecto en Vercel
+- Ve a la pestaña "Settings" > "Domains"
+- Agrega tu dominio personalizado
+
+## Funcionalidades que estarán disponibles:
+
+✅ **Landing page principal** - Completamente funcional
+✅ **Blog posts** - Generación estática
+✅ **APIs dinámicas** - Para formularios y funcionalidades admin
+✅ **Panel de administración** - Con autenticación
+✅ **Generación de contenido IA** - Si configuras las API keys
+✅ **Sistema de emails** - Para formularios de contacto
+✅ **Newsletter** - Si configuras el proveedor
+
+## Alternativas a Vercel:
+
+### Netlify
+
+- Similar a Vercel, gratis para proyectos personales
+- Mejor para sitios estáticos, menos optimizado para APIs
+
+### Railway
+
+- Ideal para aplicaciones full-stack
+- Base de datos incluida
+- Plan gratuito con límites generosos
+
+### DigitalOcean App Platform
+
+- Más control y configuración
+- Ideal para aplicaciones complejas
+
+## Ventajas de Vercel para tu proyecto:
+
+1. **Optimizado para Next.js** - Es del mismo equipo
+2. **Deploy automático** - Cada push a main despliega automáticamente
+3. **Gratis** - Hasta 100 deployments por mes
+4. **CDN global** - Carga rápida mundial
+5. **Funciones serverless** - Tus APIs funcionarán perfectamente
+6. **Preview deployments** - Cada PR crea un preview
+7. **Analytics incluido** - Métricas de performance
+
+¡Tu aplicación estará lista en minutos! 🚀
