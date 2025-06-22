@@ -1,4 +1,117 @@
 {
+  "pageType": "youtube",
+  "channelInfo": {
+    "name": "ALLSET Template",
+    "description": "Launch professional, high-converting landing pages in minutes—no design or technical skills required. Completely free to download!",
+    "subscriberCount": "10.5K",
+    "profileImage": "/static/images/testimonial1.jpg",
+    "bannerImage": "/static/images/feat1.jpg",
+    "joinDate": "Jan 2023",
+    "totalViews": "500K+",
+    "links": [
+      {
+        "platform": "Twitter",
+        "url": "https://twitter.com/allsettemplate",
+        "icon": "FaTwitter"
+      },
+      {
+        "platform": "Instagram",
+        "url": "https://instagram.com/allsettemplate",
+        "icon": "FaInstagram"
+      },
+      {
+        "platform": "YouTube",
+        "url": "https://youtube.com/allsettemplate",
+        "icon": "FaYoutube"
+      }
+    ]
+  },
+  "featuredVideos": [
+    {
+      "id": "video1",
+      "title": "How to Create a Landing Page in 5 Minutes",
+      "description": "Learn how to create a professional landing page in just 5 minutes using ALLSET Template.",
+      "thumbnail": "/static/images/feat1.jpg",
+      "viewCount": "25K",
+      "duration": "5:30",
+      "publishedAt": "2 weeks ago",
+      "url": "#"
+    },
+    {
+      "id": "video2",
+      "title": "AI-Powered Content Generation Tutorial",
+      "description": "Discover how to use AI to generate compelling content for your landing pages.",
+      "thumbnail": "/static/images/feat2.jpg",
+      "viewCount": "18K",
+      "duration": "7:45",
+      "publishedAt": "1 month ago",
+      "url": "#"
+    },
+    {
+      "id": "video3",
+      "title": "SEO Optimization for Landing Pages",
+      "description": "Learn how to optimize your landing pages for search engines to drive more traffic.",
+      "thumbnail": "/static/images/feat3.jpg",
+      "viewCount": "12K",
+      "duration": "10:15",
+      "publishedAt": "2 months ago",
+      "url": "#"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "playlist1",
+      "title": "Landing Page Tutorials",
+      "description": "Step-by-step guides to create effective landing pages",
+      "videoCount": 12,
+      "thumbnail": "/static/images/feat1.jpg",
+      "lastUpdated": "Last week"
+    },
+    {
+      "id": "playlist2",
+      "title": "AI Content Generation",
+      "description": "Learn how to leverage AI for content creation",
+      "videoCount": 8,
+      "thumbnail": "/static/images/feat2.jpg",
+      "lastUpdated": "2 weeks ago"
+    }
+  ],
+  "cta": {
+    "subscribeText": "Subscribe",
+    "subscribeLink": "#",
+    "joinText": "Join Channel",
+    "joinLink": "#",
+    "socialLinks": [
+      {
+        "platform": "Twitter",
+        "url": "https://twitter.com/allsettemplate",
+        "icon": "FaTwitter"
+      },
+      {
+        "platform": "Instagram",
+        "url": "https://instagram.com/allsettemplate",
+        "icon": "FaInstagram"
+      }
+    ]
+  },
+  "about": {
+    "title": "About ALLSET Template",
+    "content": "ALLSET Template is dedicated to helping businesses create professional, high-converting landing pages without any design or technical skills. Our AI-powered platform makes it easy to generate compelling content and beautiful designs in minutes.",
+    "stats": [
+      {
+        "label": "Videos",
+        "value": "50+"
+      },
+      {
+        "label": "Subscribers",
+        "value": "10.5K"
+      },
+      {
+        "label": "Total Views",
+        "value": "500K+"
+      }
+    ]
+  },
   "hero": {
     "title": "ALLSET Template: AI-Powered Landing Pages",
     "image": "/placeholder.jpg",

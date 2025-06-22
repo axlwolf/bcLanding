@@ -19,18 +19,31 @@ interface ChannelHeroProps {
 }
 
 const ChannelHero: React.FC<ChannelHeroProps> = ({ channelInfo }) => {
+  if (!channelInfo) {
+    // Puedes personalizar este fallback si lo deseas
+    return (
+      <section className="relative">
+        <div className="h-64 w-full bg-gray-300" />
+      </section>
+    )
+  }
+
   return (
     <section className="relative">
       {/* Banner Image */}
       <div className="relative h-64 w-full overflow-hidden sm:h-80 lg:h-96">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black/70"></div>
-        <Image
-          src={channelInfo.bannerImage}
-          alt={`${channelInfo.name} banner`}
-          fill
-          className="object-cover"
-          priority
-        />
+        {channelInfo.bannerImage ? (
+          <Image
+            src={channelInfo.bannerImage}
+            alt={`${channelInfo.name} banner`}
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <div className="h-full w-full bg-gray-300" />
+        )}
       </div>
 
       {/* Channel Info */}
@@ -60,7 +73,7 @@ const ChannelHero: React.FC<ChannelHeroProps> = ({ channelInfo }) => {
 
             {/* Social Links */}
             <div className="flex flex-wrap gap-3">
-              {channelInfo.links.map((link, index) => (
+              {channelInfo.links?.map((link, index) => (
                 <a
                   key={index}
                   href={link.url}

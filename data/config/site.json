@@ -1,5 +1,5 @@
 {
-  "activeTemplate": "Main5",
+  "activeTemplate": "Main6",
   "availableTemplates": [
     {
       "id": "Main",
@@ -87,7 +87,7 @@
       "id": "Main6",
       "name": "YouTube Channel Template",
       "description": "A YouTube channel template featuring a modern hero section, featured videos, playlists, about section, channel CTA, and contact section. Perfect for YouTube channels looking to showcase their content and engage with their audience.",
-      "image": "/static/images/templates/template-main6.jpg",
+      "image": "/static/images/templates/template-main5.jpg",
       "elements": [
         "Hero section with main features",
         "Statistics counter section",

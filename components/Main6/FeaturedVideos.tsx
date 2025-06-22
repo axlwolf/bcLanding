@@ -10,6 +10,19 @@ interface FeaturedVideosProps {
 }
 
 const FeaturedVideos: React.FC<FeaturedVideosProps> = ({ videos }) => {
+  if (!videos || videos.length === 0) {
+    return (
+      <section className="bg-black py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="mb-2 text-center text-3xl font-bold">Featured Videos</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-gray-400">
+            No featured videos available.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="bg-black py-16">
       <div className="container mx-auto px-4">
