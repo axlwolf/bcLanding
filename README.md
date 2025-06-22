@@ -360,6 +360,16 @@ Vercel detectará automáticamente que es un proyecto Next.js y usará:
 - Ve a la pestaña "Settings" > "Domains"
 - Agrega tu dominio personalizado
 
+---
+
+## Notas importantes sobre el deployment en Vercel
+
+- **Root Directory**: Debe ser la raíz del repositorio, donde se encuentra tu `package.json`, la carpeta `app/`, etc. (No selecciones la carpeta `public` como root).
+- **Output Directory**: Para Next.js, Vercel detecta automáticamente `.next` como directorio de salida del build. No necesitas cambiarlo manualmente.
+- **Carpeta `public/`**: Solo contiene archivos estáticos (imágenes, fuentes, etc.) que se sirven tal cual. El build de la app (código compilado, páginas, serverless functions) se genera en `.next`, no en `public`.
+
+> Si tienes dudas, deja la configuración por defecto de Vercel para proyectos Next.js: solo asegúrate de que el root apunte a la raíz del repo y no a una subcarpeta.
+
 ## Funcionalidades que estarán disponibles:
 
 ✅ **Landing page principal** - Completamente funcional
