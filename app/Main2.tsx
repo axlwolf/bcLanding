@@ -66,14 +66,16 @@ const FeaturesSection = ({ mainFeatures }: { mainFeatures: MainFeaturesSection }
           {/* Image Display */}
           <div className="relative col-span-8 aspect-[16/9]">
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
-              <Image
-                src={imageMap[selectedFeature.image]}
-                alt={selectedFeature.title}
-                fill
-                className="object-cover transition-all duration-700 ease-in-out"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 75vw"
-              />
+              {imageMap[selectedFeature.image] && (
+                <Image
+                  src={imageMap[selectedFeature.image]}
+                  alt={selectedFeature.title}
+                  fill
+                  className="object-cover transition-all duration-700 ease-in-out"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 75vw"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-gray-900/0" />
             </div>
           </div>
