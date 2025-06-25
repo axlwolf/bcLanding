@@ -14,8 +14,8 @@ function loadEnvFile() {
     const envPath = resolve(__dirname, '../.env.local')
     const envFile = readFileSync(envPath, 'utf8')
     const lines = envFile.split('\n')
-    
-    lines.forEach(line => {
+
+    lines.forEach((line) => {
       // Ignorar líneas vacías y comentarios
       if (line && !line.startsWith('#')) {
         const [key, ...valueParts] = line.split('=')
@@ -41,7 +41,12 @@ async function verifySupabaseConnection() {
 
   console.log('=== Verificando Configuración de Supabase ===')
   console.log('URL:', supabaseUrl ? '✓ Configurada' : '✗ No configurada')
-  console.log('Anon Key:', supabaseAnonKey ? '✓ Configurada (primeros 20 chars: ' + supabaseAnonKey.substring(0, 20) + '...)' : '✗ No configurada')
+  console.log(
+    'Anon Key:',
+    supabaseAnonKey
+      ? '✓ Configurada (primeros 20 chars: ' + supabaseAnonKey.substring(0, 20) + '...)'
+      : '✗ No configurada'
+  )
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('\n❌ Error: Variables de entorno de Supabase no configuradas')
@@ -60,7 +65,7 @@ async function verifySupabaseConnection() {
     // Verificar conexión
     console.log('\n=== Verificando Conexión ===')
     console.log('Conectando a:', supabaseUrl)
-    
+
     const { data: tables, error: tablesError } = await supabase
       .from('site_config')
       .select('*')
@@ -116,7 +121,7 @@ CREATE TRIGGER update_site_config_updated_at
 BEFORE UPDATE ON site_config 
 FOR EACH ROW 
 EXECUTE FUNCTION update_updated_at_column();`)
-        
+
         console.log('\n5. Después de ejecutar el SQL, vuelve a correr este script para verificar')
       } else {
         console.error('\n❌ Error al conectar con Supabase:', tablesError.message)
@@ -133,16 +138,17 @@ EXECUTE FUNCTION update_updated_at_column();`)
 
     console.log('✓ Conexión exitosa a Supabase')
     console.log('✓ Tabla site_config encontrada')
-    
+
     if (tables && tables.length > 0) {
       console.log('\n=== Configuración Actual ===')
       console.log(JSON.stringify(tables[0], null, 2))
       console.log('\n✅ Todo está configurado correctamente!')
     } else {
       console.log('\n⚠️  La tabla existe pero no hay datos')
-      console.log('\n📝 Ejecuta el SQL de inserción proporcionado arriba para agregar la configuración inicial')
+      console.log(
+        '\n📝 Ejecuta el SQL de inserción proporcionado arriba para agregar la configuración inicial'
+      )
     }
-
   } catch (error) {
     console.error('\n❌ Error general:', error)
     console.log('\n🔍 Detalles del error:')
