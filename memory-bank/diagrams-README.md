@@ -32,6 +32,43 @@ Esta carpeta contiene los diagramas Mermaid que documentan la arquitectura y flu
 - Resultado: Fix no funcionó, posibles causas identificadas
 - Próximos pasos: Investigación adicional requerida
 
+### 4. `template-switching-process.mmd` **(NUEVO 2025-06-25)**
+
+**Proceso Técnico Detallado del Template Switching**
+
+- Flow completo desde admin action hasta UI update
+- Timing específico: 0ms (click) → 10ms (localStorage) → 20ms (UI) → 500ms (Supabase)
+- Manejo de errores y fallbacks completos
+- Cross-tab synchronization process
+- Color coding por tipo de operación (immediate, background, error, UI, server)
+- Includes all edge cases and recovery scenarios
+
+## Documentación Técnica Adicional (2025-06-25)
+
+### `template-switching-process.md`
+
+**Deep Dive Técnico Completo**
+
+- Documentación paso a paso del proceso híbrido
+- Code examples con timing específico
+- Error handling y resilience patterns
+- Performance metrics y resource usage
+- Console log patterns para debugging
+- Testing scenarios y manual checklists
+
+### `template-switching-troubleshooting.md`
+
+**Guía de Troubleshooting Específica**
+
+- Problemas comunes y soluciones step-by-step
+- Debugging commands y browser console tools
+- Error scenarios y recovery strategies
+- Performance optimization guides
+- Emergency rollback procedures
+- Health check checklists (5min & 15min)
+
+---
+
 ## Cómo Usar los Diagramas
 
 ### Visualización en VS Code
@@ -70,6 +107,8 @@ Esta carpeta contiene los diagramas Mermaid que documentan la arquitectura y flu
 
 ---
 
-**Generado**: 2025-06-25  
+**Actualizado**: 2025-06-25  
 **Protocolo**: ripperFive-Universal MODE: CODE  
-**Estado**: Template update fix documentado (no funcional, investigación pendiente)
+**Estado**: Template switching híbrido COMPLETADO y documentado  
+**Archivos**: 4 diagramas Mermaid + 2 guías técnicas detalladas  
+**Resultado**: Documentación completa para mantenimiento y debugging

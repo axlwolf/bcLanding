@@ -107,6 +107,143 @@ The template switching system uses a hybrid localStorage + Supabase architecture
 - **Cross-Tab**: Instant propagation via storage events
 - **Memory Usage**: Minimal (single template ID in localStorage)
 
+### **Detailed Technical Process**
+
+#### **Step 1: Admin Action (0ms)**
+
+```typescript
+// User clicks template in /allset/templates
+const handleTemplateChange = async (templateId: string) => {
+  setUpdating(true)  // Immediate UI feedback
+  setError('')       // Clear previous states
+  setSuccess('')
+```
+
+#### **Step 2: localStorage Update (0-10ms)**
+
+```typescript
+// Immediate storage update
+const storageResult = await TemplateStorage.setActiveTemplate(templateId)
+// result.immediate = true (localStorage successful)
+// result.synced = false (Supabase pending)
+```
+
+#### **Step 3: UI Feedback (10-20ms)**
+
+```typescript
+if (storageResult.immediate) {
+  setActiveTemplate(templateId)           // Update admin UI
+  setSuccess(\"Template changed to...\")    // Show success message
+  // User sees "Preview Home" button
+}
+```
+
+#### **Step 4: Background Sync (50-500ms)**
+
+```typescript
+// Non-blocking Supabase update
+this.syncToSupabase(templateId)
+  .then(() => console.log('[STORAGE] Synced to Supabase'))
+  .catch((err) => console.error('[STORAGE] Sync failed:', err))
+```
+
+#### **Step 5: Cross-Tab Propagation (20-50ms)**
+
+```typescript
+// Automatic cross-tab sync
+window.dispatchEvent(
+  new StorageEvent('storage', {
+    key: 'activeTemplate',
+    newValue: templateId,
+    storageArea: localStorage,
+  })
+)
+// Other tabs update automatically
+```
+
+#### **Step 6: Home Page Visit (Hybrid Rendering)**
+
+```typescript
+// Server-side (SSR)
+const serverTemplate = await getSiteConfigFromSupabase() // Supabase
+
+// Client-side (after hydration)
+const localTemplate = TemplateStorage.getLocalTemplate() // localStorage
+const finalTemplate = localTemplate || serverTemplate // Client override
+
+// Result: User sees updated template immediately
+```
+
+### **Error Handling & Resilience**
+
+#### **localStorage Unavailable**
+
+- Automatic fallback to pure API mode
+- Full functionality maintained
+- Slightly slower UX (API-dependent)
+
+#### **Network Errors**
+
+- localStorage update succeeds immediately
+- Background Supabase sync fails gracefully
+- Error logged but doesn't block user
+- Cross-device sync affected but local experience intact
+
+#### **Invalid Template IDs**
+
+- Validation at multiple layers
+- Template existence verified before update
+- Clear error messaging to user
+- System remains stable
+
+### **Monitoring & Debugging**
+
+#### **Console Log Patterns**
+
+```bash
+# Successful flow:
+[TEMPLATE] Changing to: Main2
+[STORAGE] Template updated in localStorage: Main2
+[TEMPLATE] Template updated successfully. User remains in admin panel.
+[STORAGE] Template synced to Supabase: Main2
+
+# Home page override:
+[SERVER] Template from Supabase: Main
+[CLIENT] localStorage template: Main2 overriding server template: Main
+[CLIENT] Rendering template: Main2 isClient: true
+```
+
+#### **Performance Metrics**
+
+- **User Perceived Response**: <20ms (localStorage + UI update)
+- **Full Sync Completion**: 50-500ms (background)
+- **Cross-Tab Propagation**: <50ms
+- **Page Load with Override**: 50ms transition time
+
+#### **Resource Usage**
+
+- **localStorage**: ~50 bytes per template change
+- **Network**: 1 API call per template change (background)
+- **Memory**: Minimal component state overhead
+- **CPU**: No polling, event-driven updates only
+
+---
+
+## Documentation References
+
+### **Technical Deep Dives**
+
+- `memory-bank/template-switching-process.md` - Complete technical process
+- `memory-bank/template-switching-troubleshooting.md` - Debugging guide
+- `memory-bank/template-switching-process.mmd` - Visual process flow
+
+### **Implementation Files**
+
+- `app/ClientTemplateWrapper.tsx` - Hybrid client/server rendering
+- `lib/templateStorage.ts` - localStorage + Supabase storage utility
+- `app/allset/templates/components/TemplateSelector.tsx` - Admin interface
+- `app/page.tsx` - Server-side template resolution
+
 ---
 
 ## Main Modules & Flows

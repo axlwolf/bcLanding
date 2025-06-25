@@ -5,9 +5,17 @@ graph TB
     %% Main Functional Modules
     AI_LANDING["🤖 AI Landing Generation<br/>app/api/allset/"]
     AI_BLOG["📝 AI Blog Generation<br/>data/blog/"]
-    TEMPLATES["🎨 Template System<br/>templates/"]
+    TEMPLATES["🎨 Template System<br/>⚡ HYBRID SWITCHING<br/>templates/"]
     LEADS["📧 Lead Collection<br/>app/api/email/"]
-    ADMIN["👤 Admin Panel<br/>app/allset/"]
+    ADMIN["👤 Admin Panel<br/>🔧 NO-REDIRECT UX<br/>app/allset/"]
+    
+    %% Template Switching Specific Components
+    subgraph "⚡ TEMPLATE SWITCHING SYSTEM"
+        TEMPLATE_STORAGE["💾 TemplateStorage<br/>lib/templateStorage.ts<br/>localStorage + Supabase"]
+        CLIENT_WRAPPER["🔄 ClientTemplateWrapper<br/>app/ClientTemplateWrapper.tsx<br/>Hybrid Client/Server"]
+        TEMPLATE_SELECTOR["🎛️ TemplateSelector<br/>Admin Interface<br/>Instant Feedback"]
+        CROSS_TAB["📡 Cross-Tab Sync<br/>Storage Events<br/>Real-time Updates"]
+    end
     
     %% Technical Infrastructure
     subgraph "📁 Project Structure"
@@ -63,6 +71,14 @@ graph TB
     CORE --> TEMPLATES
     CORE --> LEADS
     CORE --> ADMIN
+    
+    %% Template Switching Connections (HIGHLIGHTED)
+    ADMIN ==> TEMPLATE_SELECTOR
+    TEMPLATE_SELECTOR ==> TEMPLATE_STORAGE
+    TEMPLATE_STORAGE ==> CLIENT_WRAPPER
+    TEMPLATE_STORAGE ==> CROSS_TAB
+    CLIENT_WRAPPER ==> MAIN_PAGES
+    CROSS_TAB -.-> TEMPLATE_SELECTOR
     
     %% Technical Structure
     AI_LANDING --> APP_DIR
@@ -142,6 +158,7 @@ graph TB
     classDef externalStyle fill:#607D8B,stroke:#455A64,stroke-width:2px,color:#fff
     classDef featureStyle fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
     classDef devStyle fill:#795548,stroke:#5D4037,stroke-width:2px,color:#fff
+    classDef templateSwitchingStyle fill:#FF5722,stroke:#D84315,stroke-width:3px,color:#fff
     
     class CORE coreStyle
     class AI_LANDING,AI_BLOG,LLM,PROVIDERS,CONTENT_GEN aiStyle
@@ -151,3 +168,4 @@ graph TB
     class VERCEL,EMAIL_SERVICE,AI_APIS,ANALYTICS externalStyle
     class BILINGUAL,RESPONSIVE,SEO,GSAP featureStyle
     class TYPESCRIPT,TAILWIND,CONTENTLAYER,TESTING devStyle
+    class TEMPLATE_STORAGE,CLIENT_WRAPPER,TEMPLATE_SELECTOR,CROSS_TAB,TEMPLATES,ADMIN templateSwitchingStyle

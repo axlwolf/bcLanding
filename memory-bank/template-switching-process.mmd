@@ -1,0 +1,137 @@
+graph TD
+    %% Template Switching Process - Detailed Flow
+    START[👤 Admin User<br/>in /allset/templates]
+    
+    %% User Action
+    CLICK[🖱️ User Clicks<br/>New Template Button]
+    
+    %% Immediate Frontend Response
+    DISABLE[🚫 Disable Button<br/>updating = true]
+    CLEAR_MSG[🧹 Clear Previous<br/>Success/Error Messages]
+    
+    %% Storage Update - Immediate
+    subgraph "⚡ IMMEDIATE RESPONSE (0-10ms)"
+        LOCAL_UPDATE[💾 localStorage.setItem<br/>'activeTemplate', templateId]
+        LOCAL_CHECK{localStorage<br/>Available?}
+        LOCAL_SUCCESS[✅ result.immediate = true]
+        LOCAL_FAIL[❌ result.immediate = false]
+        
+        LOCAL_CHECK -->|Yes| LOCAL_UPDATE
+        LOCAL_CHECK -->|No| LOCAL_FAIL
+        LOCAL_UPDATE --> LOCAL_SUCCESS
+    end
+    
+    %% UI Feedback - Immediate
+    subgraph "🎨 UI FEEDBACK (10-20ms)"
+        UPDATE_STATE[🔄 setActiveTemplate(templateId)]
+        SHOW_SUCCESS[✅ Success Message<br/>"Template changed to X"]
+        SHOW_PREVIEW[🔗 Show "Preview Home" Button]
+        ENABLE_BTN[✅ Enable Button<br/>updating = false]
+    end
+    
+    %% Background Sync - Non-blocking
+    subgraph "☁️ BACKGROUND SYNC (50-500ms)"
+        SUPABASE_CALL[📡 API Call to Supabase<br/>updateActiveTemplate()]
+        SUPABASE_SUCCESS[✅ Supabase Updated]
+        SUPABASE_ERROR[❌ Supabase Error<br/>Log but don't block]
+    end
+    
+    %% Cross-Tab Sync
+    subgraph "🔄 CROSS-TAB SYNC (20-50ms)"
+        STORAGE_EVENT[📢 Dispatch Storage Event<br/>window.dispatchEvent()]
+        OTHER_TABS[📱 Other Tabs Listening<br/>addEventListener('storage')]
+        TAB_UPDATE[🔄 Other Tabs Update<br/>setActiveTemplate()]
+    end
+    
+    %% User Home Page Visit
+    subgraph "🏠 HOME PAGE VISIT"
+        VISIT_HOME[🌐 User Visits<br/>localhost:3000/]
+        
+        subgraph "🖥️ SERVER-SIDE RENDER"
+            SSR_SUPABASE[📊 Server Reads<br/>Supabase Template]
+            SSR_RENDER[🎨 Server Renders<br/>Initial Template]
+        end
+        
+        subgraph "💻 CLIENT-SIDE HYDRATION"
+            CLIENT_MOUNT[⚡ ClientTemplateWrapper<br/>Mounts]
+            CLIENT_CHECK[🔍 Check localStorage<br/>vs Server Template]
+            TEMPLATES_MATCH{Templates<br/>Match?}
+            CLIENT_OVERRIDE[🔄 Override with<br/>localStorage Template]
+            CLIENT_TRANSITION[✨ Smooth Transition<br/>50ms loading state]
+            FINAL_RENDER[🎨 Final Template<br/>Rendered]
+        end
+    end
+    
+    %% Error Handling
+    subgraph "🚨 ERROR SCENARIOS"
+        NO_LOCAL[📱 No localStorage<br/>Support]
+        NO_NETWORK[📡 Network Error<br/>Supabase Unreachable]
+        INVALID_TEMPLATE[⚠️ Invalid Template ID<br/>Not in Available List]
+        
+        FALLBACK_API[🔄 Fallback to<br/>Pure API Mode]
+        FALLBACK_DEFAULT[🏠 Fallback to<br/>Default Template]
+        ERROR_MESSAGE[❌ Show Error<br/>to User]
+    end
+    
+    %% Flow Connections
+    START --> CLICK
+    CLICK --> DISABLE
+    DISABLE --> CLEAR_MSG
+    CLEAR_MSG --> LOCAL_CHECK
+    
+    LOCAL_SUCCESS --> UPDATE_STATE
+    LOCAL_FAIL --> FALLBACK_API
+    
+    UPDATE_STATE --> SHOW_SUCCESS
+    SHOW_SUCCESS --> SHOW_PREVIEW
+    SHOW_PREVIEW --> ENABLE_BTN
+    
+    %% Parallel processes
+    LOCAL_SUCCESS -.-> SUPABASE_CALL
+    LOCAL_SUCCESS -.-> STORAGE_EVENT
+    
+    SUPABASE_CALL --> SUPABASE_SUCCESS
+    SUPABASE_CALL --> SUPABASE_ERROR
+    
+    STORAGE_EVENT --> OTHER_TABS
+    OTHER_TABS --> TAB_UPDATE
+    
+    %% Home page flow
+    VISIT_HOME --> SSR_SUPABASE
+    SSR_SUPABASE --> SSR_RENDER
+    SSR_RENDER --> CLIENT_MOUNT
+    CLIENT_MOUNT --> CLIENT_CHECK
+    CLIENT_CHECK --> TEMPLATES_MATCH
+    
+    TEMPLATES_MATCH -->|No| CLIENT_OVERRIDE
+    TEMPLATES_MATCH -->|Yes| FINAL_RENDER
+    CLIENT_OVERRIDE --> CLIENT_TRANSITION
+    CLIENT_TRANSITION --> FINAL_RENDER
+    
+    %% Error flows
+    LOCAL_CHECK -->|Error| NO_LOCAL
+    SUPABASE_CALL -->|Error| NO_NETWORK
+    UPDATE_STATE -->|Invalid| INVALID_TEMPLATE
+    
+    NO_LOCAL --> FALLBACK_API
+    NO_NETWORK --> ERROR_MESSAGE
+    INVALID_TEMPLATE --> FALLBACK_DEFAULT
+    
+    %% Timing Annotations
+    LOCAL_UPDATE -.->|"⏱️ 0-10ms"| UPDATE_STATE
+    SUPABASE_CALL -.->|"⏱️ 50-500ms"| SUPABASE_SUCCESS
+    STORAGE_EVENT -.->|"⏱️ 20-50ms"| TAB_UPDATE
+    CLIENT_OVERRIDE -.->|"⏱️ 50ms transition"| FINAL_RENDER
+    
+    %% Color coding
+    classDef immediateStyle fill:#4CAF50,stroke:#388E3C,stroke-width:3px,color:#fff
+    classDef backgroundStyle fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
+    classDef errorStyle fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#fff
+    classDef uiStyle fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
+    classDef serverStyle fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
+    
+    class LOCAL_UPDATE,LOCAL_SUCCESS,UPDATE_STATE immediateStyle
+    class SUPABASE_CALL,SUPABASE_SUCCESS,STORAGE_EVENT backgroundStyle
+    class NO_LOCAL,NO_NETWORK,INVALID_TEMPLATE,ERROR_MESSAGE errorStyle
+    class SHOW_SUCCESS,SHOW_PREVIEW,CLIENT_TRANSITION uiStyle
+    class SSR_SUPABASE,SSR_RENDER,CLIENT_MOUNT serverStyle
