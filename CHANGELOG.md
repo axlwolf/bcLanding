@@ -2,16 +2,11 @@
 
 ## 2025-06-24
 
-### Major Documentation & Architecture Overhaul
+### Supabase Template Sync Migration
 
-- Updated all `memory-bank` documentation files to reflect a Next.js-first, modular, AI-powered architecture.
-- Added a new `architecture.md` with a clear overview of modules, flows, and extensibility.
-- Updated `techContext.md` to remove legacy Astro/Angular content and align with the new stack.
-- Rewrote `strategy.md` to focus on phased, actionable Next.js development and AI/LLM integration.
-- Ensured all documentation is in English and consistent with the new project vision.
-- Integrated mind map requirements into the technical docs.
-- Prepared for open source and cloud-agnostic deployment.
-
-### README Update (pending)
-
-- Will update `README.md` to match a modern, badge-rich, feature-focused, and architecture-documented format (similar to EasyTask example).
+- Migrated all template and site configuration from local files to Supabase (`site_config` table).
+- Refactored `/api/allset/templates` and `/api/allset/templates/update` for cloud-native persistence.
+- Fixed frontend fetch and UI sync issues after template changes.
+- Added detailed logging and improved debugging for template management.
+- Fixed Prettier/ESLint formatting errors blocking build.
+- Documented required Supabase tables for production use.
