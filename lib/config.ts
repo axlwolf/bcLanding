@@ -1,6 +1,4 @@
-import fs from 'fs/promises'
-import path from 'path'
-import { cache } from 'react'
+import { supabase } from './supabaseClient'
 
 export interface Template {
   id: string
@@ -13,18 +11,19 @@ export interface SiteConfig {
   availableTemplates: Template[]
 }
 
-const CONFIG_PATH = path.join(process.cwd(), 'data/config/site.json')
-
 /**
- * Get the site configuration (cached for performance)
+ * Get the site configuration from Supabase
  */
-export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
-  try {
-    const configData = await fs.readFile(CONFIG_PATH, 'utf8')
-    return JSON.parse(configData) as SiteConfig
-  } catch (error) {
-    console.error('Error reading site config:', error)
-    // Return default config if file doesn't exist or is invalid
+export async function getSiteConfigFromSupabase(): Promise<SiteConfig> {
+  const { data, error } = await supabase
+    .from('site_config')
+    .select('value')
+    .eq('key', 'site_config')
+    .single()
+
+  if (error) {
+    console.error('Error fetching site config from Supabase:', error)
+    // Fallback to default config if error
     return {
       activeTemplate: 'Main',
       availableTemplates: [
@@ -36,37 +35,46 @@ export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
       ],
     }
   }
-})
+
+  // value is stored as JSONB
+  return data.value as SiteConfig
+}
 
 /**
- * Update the site configuration
+ * Update the site configuration in Supabase
  */
-export async function updateSiteConfig(config: Partial<SiteConfig>): Promise<SiteConfig> {
-  try {
-    // Read current config
-    const currentConfig = await getSiteConfig()
-
-    // Merge with new config
-    const updatedConfig = {
-      ...currentConfig,
-      ...config,
-    }
-
-    // Write updated config
-    await fs.writeFile(CONFIG_PATH, JSON.stringify(updatedConfig, null, 2), 'utf8')
-
-    return updatedConfig
-  } catch (error) {
-    console.error('Error updating site config:', error)
-    throw new Error('Failed to update site configuration')
+export async function updateSiteConfigInSupabase(config: Partial<SiteConfig>): Promise<SiteConfig> {
+  // Read current config from Supabase
+  const currentConfig = await getSiteConfigFromSupabase()
+  const updatedConfig = {
+    ...currentConfig,
+    ...config,
   }
+
+  const { error } = await supabase.from('site_config').upsert(
+    [
+      {
+        key: 'site_config',
+        value: updatedConfig,
+        updated_at: new Date().toISOString(),
+      },
+    ],
+    { onConflict: 'key' }
+  )
+
+  if (error) {
+    console.error('Error updating site config in Supabase:', error)
+    throw new Error('Failed to update site configuration in Supabase')
+  }
+
+  return updatedConfig
 }
 
 /**
  * Update the active template
  */
 export async function updateActiveTemplate(templateId: string): Promise<SiteConfig> {
-  const config = await getSiteConfig()
+  const config = await getSiteConfigFromSupabase()
 
   // Verify the template exists
   const templateExists = config.availableTemplates.some((t) => t.id === templateId)
@@ -74,14 +82,14 @@ export async function updateActiveTemplate(templateId: string): Promise<SiteConf
     throw new Error(`Template with ID "${templateId}" does not exist`)
   }
 
-  return updateSiteConfig({ activeTemplate: templateId })
+  return updateSiteConfigInSupabase({ activeTemplate: templateId })
 }
 
 /**
  * Add a new template to the available templates
  */
 export async function addTemplate(template: Template): Promise<SiteConfig> {
-  const config = await getSiteConfig()
+  const config = await getSiteConfigFromSupabase()
 
   // Check if template with this ID already exists
   if (config.availableTemplates.some((t) => t.id === template.id)) {
@@ -89,5 +97,5 @@ export async function addTemplate(template: Template): Promise<SiteConfig> {
   }
 
   const updatedTemplates = [...config.availableTemplates, template]
-  return updateSiteConfig({ availableTemplates: updatedTemplates })
+  return updateSiteConfigInSupabase({ availableTemplates: updatedTemplates })
 }
