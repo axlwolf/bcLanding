@@ -272,6 +272,54 @@ memory-bank/
 
 ---
 
+## [2025-06-25] Vercel Deployment Fix ✅ COMPLETED
+
+- ✅ **Fixed build error**: "supabaseUrl is required" during Vercel deployment
+- ✅ **Enhanced environment validation**: Added proper checks and fallbacks in `supabaseClient.ts`
+- ✅ **Runtime error handling**: Added Supabase config validation in `config.ts` functions
+- ✅ **Graceful fallbacks**: System works with default templates if Supabase unavailable
+- ✅ **Created deployment guide**: `VERCEL_SETUP.md` with complete environment variable setup
+- ✅ **Updated README.md**: Added environment requirements and deployment instructions
+
+### **Root Cause**:
+
+- Environment variables `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` not configured in Vercel
+- Supabase client initialization failing during build time
+- No fallback handling for missing environment variables
+
+### **Technical Solution**:
+
+```typescript
+// Before: Hard failure
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+
+// After: Graceful handling
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+if (!supabaseUrl && process.env.NODE_ENV === 'production') {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL is required in production')
+}
+const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-anon-key'
+)
+```
+
+### **Deployment Requirements**:
+
+- ⚙️ **Environment Variables**: Must be configured in Vercel Dashboard
+- 📊 **Database Setup**: `site_config` table must exist in Supabase
+- 🔒 **API Keys**: Supabase anon key must be valid and accessible
+- 📝 **Documentation**: Complete setup guide in `VERCEL_SETUP.md`
+
+### **Fallback Strategy**:
+
+- **Build Time**: Placeholder values allow successful build
+- **Runtime**: Graceful degradation to default templates if Supabase unavailable
+- **Error Handling**: Clear error messages for configuration issues
+- **Development**: Works locally without Supabase for basic functionality
+
+---
+
 ## Next Steps (Future Development)
 
 - ✅ **COMPLETED**: Template switching system fully implemented and documented
