@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 // Define Template interface here to avoid server component imports in client component
@@ -14,6 +15,7 @@ interface Template {
 }
 
 export default function TemplateSelector() {
+  const router = useRouter()
   const [templates, setTemplates] = useState<Template[]>([])
   const [activeTemplate, setActiveTemplate] = useState<string>('')
   const [loading, setLoading] = useState(true)
@@ -79,6 +81,7 @@ export default function TemplateSelector() {
         console.log('Refetching templates...')
         await fetchTemplates()
         setActiveTemplate(data.activeTemplate)
+        router.refresh() // Fuerza el refresco de la página principal para re-render SSR
         setSuccess(`Template changed to "${templates.find((t) => t.id === templateId)?.name}"`)
       } else {
         throw new Error(data.message || 'Failed to update template')

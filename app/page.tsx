@@ -5,13 +5,13 @@ import Main3 from './Main3'
 import Main4 from './Main4'
 import Main5 from './Main5'
 import Main6 from './Main6'
-import { getSiteConfig } from '../lib/config'
+import { getSiteConfigFromSupabase } from '../lib/config'
 
 export default async function Page() {
   // We don't need to pass posts to Main/Main2 as they handle their own data fetching
 
   // Get the active template from config
-  const config = await getSiteConfig()
+  const config = await getSiteConfigFromSupabase()
   const activeTemplate = config.activeTemplate
 
   // Return the appropriate template based on the active template
