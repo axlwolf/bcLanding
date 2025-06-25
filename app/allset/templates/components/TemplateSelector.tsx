@@ -22,34 +22,33 @@ export default function TemplateSelector() {
   const [success, setSuccess] = useState('')
 
   // Fetch available templates
-  useEffect(() => {
-    async function fetchTemplates() {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/allset/templates', {
-          // Add cache: 'no-store' to avoid stale data
-          cache: 'no-store' as RequestCache,
-        })
+  async function fetchTemplates() {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/allset/templates', {
+        cache: 'no-store' as RequestCache,
+      })
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch templates')
-        }
-
-        const data = await response.json()
-
-        if (data.success) {
-          setTemplates(data.availableTemplates)
-          setActiveTemplate(data.activeTemplate)
-        } else {
-          throw new Error(data.message || 'Failed to fetch templates')
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setLoading(false)
+      if (!response.ok) {
+        throw new Error('Failed to fetch templates')
       }
-    }
 
+      const data = await response.json()
+
+      if (data.success) {
+        setTemplates(data.availableTemplates)
+        setActiveTemplate(data.activeTemplate)
+      } else {
+        throw new Error(data.message || 'Failed to fetch templates')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchTemplates()
   }, [])
 
@@ -76,6 +75,9 @@ export default function TemplateSelector() {
       const data = await response.json()
 
       if (data.success) {
+        setSuccess('Template updated successfully!')
+        console.log('Refetching templates...')
+        await fetchTemplates()
         setActiveTemplate(data.activeTemplate)
         setSuccess(`Template changed to "${templates.find((t) => t.id === templateId)?.name}"`)
       } else {

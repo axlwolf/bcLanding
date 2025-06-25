@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { cache } from 'react'
+import { supabase } from './supabaseClient'
 
 export interface Template {
   id: string
@@ -16,7 +17,7 @@ export interface SiteConfig {
 const CONFIG_PATH = path.join(process.cwd(), 'data/config/site.json')
 
 /**
- * Get the site configuration (cached for performance)
+ * Get the site configuration (cached for performance) - legacy local
  */
 export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
   try {
@@ -39,7 +40,36 @@ export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
 })
 
 /**
- * Update the site configuration
+ * Get the site configuration from Supabase
+ */
+export async function getSiteConfigFromSupabase(): Promise<SiteConfig> {
+  const { data, error } = await supabase
+    .from('site_config')
+    .select('value')
+    .eq('key', 'site_config')
+    .single()
+
+  if (error) {
+    console.error('Error fetching site config from Supabase:', error)
+    // Fallback to default config if error
+    return {
+      activeTemplate: 'Main',
+      availableTemplates: [
+        {
+          id: 'Main',
+          name: 'Default Template',
+          description: 'The default layout with standard spacing and container widths',
+        },
+      ],
+    }
+  }
+
+  // value is stored as JSONB
+  return data.value as SiteConfig
+}
+
+/**
+ * Update the site configuration (legacy local)
  */
 export async function updateSiteConfig(config: Partial<SiteConfig>): Promise<SiteConfig> {
   try {
@@ -60,6 +90,36 @@ export async function updateSiteConfig(config: Partial<SiteConfig>): Promise<Sit
     console.error('Error updating site config:', error)
     throw new Error('Failed to update site configuration')
   }
+}
+
+/**
+ * Update the site configuration in Supabase
+ */
+export async function updateSiteConfigInSupabase(config: Partial<SiteConfig>): Promise<SiteConfig> {
+  // Read current config from Supabase
+  const currentConfig = await getSiteConfigFromSupabase()
+  const updatedConfig = {
+    ...currentConfig,
+    ...config,
+  }
+
+  const { error } = await supabase.from('site_config').upsert(
+    [
+      {
+        key: 'site_config',
+        value: updatedConfig,
+        updated_at: new Date().toISOString(),
+      },
+    ],
+    { onConflict: 'key' }
+  )
+
+  if (error) {
+    console.error('Error updating site config in Supabase:', error)
+    throw new Error('Failed to update site configuration in Supabase')
+  }
+
+  return updatedConfig
 }
 
 /**

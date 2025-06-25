@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getSiteConfig } from '@/lib/config'
+import { getSiteConfigFromSupabase } from '@/lib/config'
 
 // For static export, we need to handle this differently
 export const dynamic = 'error'
 
 export async function GET() {
   try {
-    const config = await getSiteConfig()
+    const config = await getSiteConfigFromSupabase()
 
     return NextResponse.json({
       success: true,
