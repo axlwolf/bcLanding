@@ -9,6 +9,7 @@
 - Fixed Prettier/ESLint formatting errors blocking build.
 - Documented and created all required Supabase tables (emails, config, etc.) for production use.
 - Next build now passes; all config is cloud-native and Vercel-compatible.
+- Refactored backend endpoint for template update to use `updateActiveTemplate` for validation and update, centralizing logic and reducing duplication.
 
 ---
 

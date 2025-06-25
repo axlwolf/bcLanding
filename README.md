@@ -19,6 +19,7 @@ BoothieCall is a premium landing page generator for photo booth rentals, built w
 - All template and site configuration is now stored in the `site_config` table in Supabase.
 - Endpoints `/api/allset/templates` and `/api/allset/templates/update` have been refactored to use Supabase as the single source of truth.
 - Frontend now fetches and updates config directly from the backend, eliminating stale/cached UI bugs.
+- All update logic for the active template is now centralized in the `updateActiveTemplate` function, reducing duplication and improving maintainability.
 - See `memory-bank/progress.md` for detailed migration history.
 
 ---

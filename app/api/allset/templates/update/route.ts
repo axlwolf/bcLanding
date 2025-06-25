@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSiteConfigFromSupabase, updateSiteConfigInSupabase } from '@/lib/config'
+import { updateActiveTemplate } from '@/lib/config'
 
 // For static export, we need to handle this differently
 export const dynamic = 'error'
@@ -18,30 +18,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Leer configuración actual desde Supabase
-    console.log('[API] Fetching site config from Supabase...')
-    const config = await getSiteConfigFromSupabase()
-    console.log('[API] Current config from Supabase:', config)
-
-    // Mostrar los IDs de los templates disponibles para depuración
-    console.log(
-      '[API] availableTemplates IDs:',
-      config.availableTemplates.map((t) => t.id)
-    )
-
-    // Validar que el template existe
-    const templateExists = config.availableTemplates.some((t) => t.id === templateId)
-    if (!templateExists) {
-      console.warn(`[API] Template with ID "${templateId}" does not exist`)
-      return NextResponse.json(
-        { success: false, message: `Template with ID "${templateId}" does not exist` },
-        { status: 400 }
-      )
-    }
-
-    // Actualizar el template activo en Supabase
+    // Actualizar el template activo en Supabase usando función centralizada
     console.log('[API] Updating activeTemplate in Supabase...')
-    const updatedConfig = await updateSiteConfigInSupabase({ activeTemplate: templateId })
+    const updatedConfig = await updateActiveTemplate(templateId)
     console.log('[API] Updated config in Supabase:', updatedConfig)
 
     return NextResponse.json({

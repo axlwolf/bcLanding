@@ -10,3 +10,4 @@
 - Added detailed logging and improved debugging for template management.
 - Fixed Prettier/ESLint formatting errors blocking build.
 - Documented required Supabase tables for production use.
+- Refactored template update endpoint to use a single function (`updateActiveTemplate`) for validation and updating, reducing code duplication and improving maintainability.
