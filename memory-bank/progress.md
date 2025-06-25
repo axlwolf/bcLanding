@@ -13,6 +13,51 @@
 
 ---
 
+## [2025-06-25] Vercel Production Errors Resolution ✅ COMPLETED
+
+### **🐛 Fixed 401 Unauthorized Error**
+
+- ✅ **Issue**: `site.webmanifest` returning 401 Unauthorized in production
+- ✅ **Root Cause**: Middleware blocking access to static files
+- ✅ **Solution**:
+  - Updated `middleware.ts` with explicit public paths whitelist
+  - Created `vercel.json` with proper headers for static assets
+  - Added CORS and Cache-Control headers for favicon files
+
+### **🐛 Fixed 500 Internal Server Error**
+
+- ✅ **Issue**: `/api/allset/templates/update` failing with 500 error
+- ✅ **Root Cause**: Missing Supabase environment variables and table
+- ✅ **Solution**:
+  - Enhanced API error handling with specific error types
+  - Added environment variable validation
+  - Created `scripts/verify-supabase.mjs` for connection testing
+  - Added `npm run verify-supabase` command
+
+### **🛠️ Development Tools Created**
+
+- ✅ **Supabase Verification Script**: Tests connection and provides setup instructions
+- ✅ **Enhanced Error Messages**: Specific error codes for debugging
+- ✅ **CORS Support**: Added OPTIONS handler to API routes
+- ✅ **Documentation**: Created `TROUBLESHOOTING_VERCEL.md`
+
+### **📚 Documentation Updates**
+
+- ✅ Updated `vercel_errors_and_solutions.md` with complete error resolution guide
+- ✅ Enhanced `CHANGELOG.md` with deployment fixes
+- ✅ Created comprehensive troubleshooting documentation
+- ✅ Added SQL setup instructions for Supabase table creation
+
+### **🚀 Production Ready**
+
+- ✅ All Vercel deployment errors resolved
+- ✅ Environment variable requirements documented
+- ✅ Database setup SQL provided
+- ✅ Verification tools in place
+- ✅ Fallback strategies implemented
+
+---
+
 ## [2025-06-25] Architecture Documentation Update ✅ COMPLETED
 
 - ✅ Created comprehensive system architecture Mermaid diagram integrating functional and technical views
