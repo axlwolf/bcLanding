@@ -1,40 +1,15 @@
-// No need to import blog data as Main/Main2 handle their own data fetching
-import Main from './Main'
-import Main2 from './Main2'
-import Main3 from './Main3'
-import Main4 from './Main4'
-import Main5 from './Main5'
-import Main6 from './Main6'
+// Hybrid approach: Server gets template from Supabase, Client can override with localStorage
 import { getSiteConfigFromSupabase } from '../lib/config'
+import ClientTemplateWrapper from './ClientTemplateWrapper'
 
 export default async function Page() {
-  // We don't need to pass posts to Main/Main2 as they handle their own data fetching
-
-  // Get the active template from config
+  // Server-side: Get template from Supabase (always reliable)
   const config = await getSiteConfigFromSupabase()
-  const activeTemplate = config.activeTemplate
+  const serverTemplate = config.activeTemplate
 
-  // Return the appropriate template based on the active template
-  if (activeTemplate === 'Main2') {
-    return <Main2 />
-  }
+  console.log('[SERVER] Template from Supabase:', serverTemplate)
 
-  if (activeTemplate === 'Main3') {
-    return <Main3 />
-  }
-
-  if (activeTemplate === 'Main4') {
-    return <Main4 />
-  }
-
-  if (activeTemplate === 'Main5') {
-    return <Main5 />
-  }
-
-  if (activeTemplate === 'Main6') {
-    return <Main6 />
-  }
-
-  // Default to Main
-  return <Main />
+  // Pass server template to client wrapper
+  // Client will check localStorage and can override if needed
+  return <ClientTemplateWrapper serverTemplate={serverTemplate} />
 }

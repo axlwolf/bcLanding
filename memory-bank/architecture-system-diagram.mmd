@@ -1,0 +1,153 @@
+graph TB
+    %% Core System
+    CORE["📱 BoothieCall<br/>Premium Photo Booth Landing Platform"]
+    
+    %% Main Functional Modules
+    AI_LANDING["🤖 AI Landing Generation<br/>app/api/allset/"]
+    AI_BLOG["📝 AI Blog Generation<br/>data/blog/"]
+    TEMPLATES["🎨 Template System<br/>templates/"]
+    LEADS["📧 Lead Collection<br/>app/api/email/"]
+    ADMIN["👤 Admin Panel<br/>app/allset/"]
+    
+    %% Technical Infrastructure
+    subgraph "📁 Project Structure"
+        APP_DIR["app/<br/>Next.js App Router"]
+        COMPONENTS["components/<br/>UI Components"]
+        LIB["lib/<br/>Core Logic"]
+        DATA["data/<br/>Content & Config"]
+        MEMORY["memory-bank/<br/>Documentation"]
+    end
+    
+    %% AI & Content Generation
+    subgraph "🤖 AI Engine"
+        LLM["lib/llm/<br/>LLM Providers"]
+        PROVIDERS["lib/providers/<br/>OpenAI, Google, etc."]
+        CONTENT_GEN["Content Generation<br/>JSON + Markdown"]
+    end
+    
+    %% Data Layer
+    subgraph "🗄️ Data Layer"
+        SUPABASE[("Supabase<br/>Configuration")]
+        SQLITE[("SQLite<br/>Local Dev")]
+        CONFIG["lib/config.ts<br/>Site Configuration"]
+        EMAIL_DB["Email Storage<br/>Subscriptions"]
+    end
+    
+    %% Frontend Components
+    subgraph "🎨 Frontend"
+        MAIN_PAGES["Main Templates<br/>Main.tsx, Main2-6.tsx"]
+        UI_COMPONENTS["Components<br/>Card, Modal, Forms"]
+        LAYOUTS["layouts/<br/>Page Layouts"]
+        THEMES["Theme System<br/>Light/Dark"]
+    end
+    
+    %% API Endpoints
+    subgraph "🔌 API Layer"
+        TEMPLATE_API["/api/templates<br/>Template Management"]
+        EMAIL_API["/api/email<br/>Lead Processing"]
+        CONFIG_API["/api/allset<br/>Configuration"]
+        NEWSLETTER["/api/newsletter<br/>Subscriptions"]
+    end
+    
+    %% External Integrations
+    subgraph "🌐 External Services"
+        VERCEL["☁️ Vercel<br/>Deployment"]
+        EMAIL_SERVICE["📮 Email Service<br/>Nodemailer"]
+        AI_APIS["🤖 AI APIs<br/>OpenAI, Google"]
+        ANALYTICS["📊 Analytics<br/>@vercel/analytics"]
+    end
+    
+    %% Core Connections
+    CORE --> AI_LANDING
+    CORE --> AI_BLOG
+    CORE --> TEMPLATES
+    CORE --> LEADS
+    CORE --> ADMIN
+    
+    %% Technical Structure
+    AI_LANDING --> APP_DIR
+    AI_BLOG --> DATA
+    TEMPLATES --> COMPONENTS
+    LEADS --> LIB
+    ADMIN --> APP_DIR
+    
+    %% AI Engine
+    AI_LANDING --> LLM
+    AI_BLOG --> LLM
+    LLM --> PROVIDERS
+    PROVIDERS --> CONTENT_GEN
+    
+    %% Data Flow
+    CONFIG --> SUPABASE
+    CONFIG --> SQLITE
+    LEADS --> EMAIL_DB
+    EMAIL_DB --> SUPABASE
+    
+    %% Frontend Flow
+    APP_DIR --> MAIN_PAGES
+    COMPONENTS --> UI_COMPONENTS
+    MAIN_PAGES --> LAYOUTS
+    LAYOUTS --> THEMES
+    
+    %% API Flow
+    APP_DIR --> TEMPLATE_API
+    LEADS --> EMAIL_API
+    ADMIN --> CONFIG_API
+    EMAIL_DB --> NEWSLETTER
+    
+    %% External Integrations
+    TEMPLATE_API --> SUPABASE
+    EMAIL_API --> EMAIL_SERVICE
+    CONFIG_API --> SUPABASE
+    LLM --> AI_APIS
+    APP_DIR --> VERCEL
+    ANALYTICS --> VERCEL
+    
+    %% Feature Highlights
+    subgraph "✨ Key Features"
+        BILINGUAL["🌍 Bilingual<br/>ES/EN Support"]
+        RESPONSIVE["📱 Mobile First<br/>Responsive Design"]
+        SEO["🔍 SEO Optimized<br/>Blog System"]
+        GSAP["🎭 GSAP Animations<br/>Micro-interactions"]
+    end
+    
+    THEMES --> BILINGUAL
+    UI_COMPONENTS --> RESPONSIVE
+    AI_BLOG --> SEO
+    COMPONENTS --> GSAP
+    
+    %% Development Tools
+    subgraph "🛠️ Development"
+        TYPESCRIPT["TypeScript<br/>Type Safety"]
+        TAILWIND["Tailwind CSS<br/>Styling"]
+        CONTENTLAYER["Contentlayer<br/>MDX Processing"]
+        TESTING["Testing<br/>Jest + Playwright"]
+    end
+    
+    COMPONENTS --> TYPESCRIPT
+    UI_COMPONENTS --> TAILWIND
+    DATA --> CONTENTLAYER
+    
+    %% Memory Bank Integration
+    MEMORY --> CORE
+    MEMORY -.-> APP_DIR
+    MEMORY -.-> LIB
+    MEMORY -.-> DATA
+    
+    classDef coreStyle fill:#D4AF37,stroke:#B8860B,stroke-width:3px,color:#000
+    classDef aiStyle fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
+    classDef dataStyle fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
+    classDef frontendStyle fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
+    classDef apiStyle fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
+    classDef externalStyle fill:#607D8B,stroke:#455A64,stroke-width:2px,color:#fff
+    classDef featureStyle fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
+    classDef devStyle fill:#795548,stroke:#5D4037,stroke-width:2px,color:#fff
+    
+    class CORE coreStyle
+    class AI_LANDING,AI_BLOG,LLM,PROVIDERS,CONTENT_GEN aiStyle
+    class SUPABASE,SQLITE,CONFIG,EMAIL_DB dataStyle
+    class MAIN_PAGES,UI_COMPONENTS,LAYOUTS,THEMES frontendStyle
+    class TEMPLATE_API,EMAIL_API,CONFIG_API,NEWSLETTER apiStyle
+    class VERCEL,EMAIL_SERVICE,AI_APIS,ANALYTICS externalStyle
+    class BILINGUAL,RESPONSIVE,SEO,GSAP featureStyle
+    class TYPESCRIPT,TAILWIND,CONTENTLAYER,TESTING devStyle

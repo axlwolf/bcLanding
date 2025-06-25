@@ -1,0 +1,113 @@
+graph TD
+    ROOT["📁 bcLanding/"]
+    
+    %% Main Directories
+    ROOT --> APP["📁 app/"]
+    ROOT --> COMPONENTS["📁 components/"]
+    ROOT --> LIB["📁 lib/"]
+    ROOT --> DATA["📁 data/"]
+    ROOT --> MEMORY["📁 memory-bank/"]
+    ROOT --> TEMPLATES["📁 templates/"]
+    ROOT --> PUBLIC["📁 public/"]
+    ROOT --> CONFIG_FILES["⚙️ Config Files"]
+    
+    %% App Directory (Next.js App Router)
+    APP --> APP_API["📁 api/"]
+    APP --> APP_PAGES["📄 Pages"]
+    APP --> APP_LAYOUT["📄 layout.tsx"]
+    
+    APP_API --> API_ALLSET["📁 allset/"]
+    APP_API --> API_EMAIL["📁 email/"]
+    APP_API --> API_NEWSLETTER["📁 newsletter/"]
+    APP_API --> API_TEMPLATES["📁 templates/"]
+    APP_API --> API_OTHER["📁 Others..."]
+    
+    APP_PAGES --> MAIN_TEMPLATES["📄 Main.tsx<br/>Main2-6.tsx"]
+    APP_PAGES --> PAGE_DIRS["📁 about/, blog/, etc."]
+    
+    %% Components
+    COMPONENTS --> UI_COMP["📄 UI Components"]
+    COMPONENTS --> LAYOUT_COMP["📄 Layout Components"]
+    COMPONENTS --> MAIN_COMP["📁 Main5/, Main6/"]
+    
+    UI_COMP --> CARD["Card.tsx"]
+    UI_COMP --> MODAL["Modal Components"]
+    UI_COMP --> FORMS["Form Components"]
+    
+    LAYOUT_COMP --> HEADER["Header.tsx"]
+    LAYOUT_COMP --> FOOTER["Footer.tsx"]
+    LAYOUT_COMP --> NAV["MobileNav.tsx"]
+    
+    %% Lib Directory (Core Logic)
+    LIB --> LIB_CONFIG["📄 config.ts"]
+    LIB --> LIB_SUPABASE["📄 supabaseClient.ts"]
+    LIB --> LIB_SUBDIRS["📁 Subdirectories"]
+    
+    LIB_SUBDIRS --> LIB_LLM["📁 llm/"]
+    LIB_SUBDIRS --> LIB_EMAIL["📁 email/"]
+    LIB_SUBDIRS --> LIB_MODELS["📁 models/"]
+    LIB_SUBDIRS --> LIB_PROVIDERS["📁 providers/"]
+    LIB_SUBDIRS --> LIB_UTILS["📁 utils/"]
+    
+    %% Data Directory
+    DATA --> DATA_CONFIG["📁 config/"]
+    DATA --> DATA_BLOG["📁 blog/"]
+    DATA --> DATA_AUTHORS["📁 authors/"]
+    DATA --> DATA_FILES["📄 Static Files"]
+    
+    DATA_FILES --> SITE_META["siteMetadata.js"]
+    DATA_FILES --> HEADER_NAV["headerNavLinks.ts"]
+    DATA_FILES --> LANDING_CONTENT["landingContent.json"]
+    DATA_FILES --> THEME_JSON["theme.json"]
+    
+    %% Memory Bank (Documentation)
+    MEMORY --> MEMORY_DOCS["📄 Documentation"]
+    MEMORY_DOCS --> PROJECT_BRIEF["projectbrief.md"]
+    MEMORY_DOCS --> RIPPER_FIVE["ripperFive-Universal.mdc"]
+    MEMORY_DOCS --> ARCHITECTURE["architecture.md"]
+    MEMORY_DOCS --> PROGRESS["progress.md"]
+    MEMORY_DOCS --> TECH_CONTEXT["techContext.md"]
+    MEMORY_DOCS --> PRODUCT_CONTEXT["productContext.md"]
+    
+    %% Configuration Files
+    CONFIG_FILES --> PACKAGE_JSON["package.json"]
+    CONFIG_FILES --> NEXT_CONFIG["next.config.mjs"]
+    CONFIG_FILES --> TAILWIND_CONFIG["tailwind.config.js"]
+    CONFIG_FILES --> TYPESCRIPT_CONFIG["tsconfig.json"]
+    CONFIG_FILES --> ENV_FILES[".env.example<br/>.env.local"]
+    
+    %% Key Integration Points
+    subgraph "🔗 Key Integrations"
+        SUPABASE_INT["🗄️ Supabase Integration"]
+        AI_INT["🤖 AI Integration"]
+        EMAIL_INT["📧 Email Integration"]
+        THEME_INT["🎨 Theme Integration"]
+    end
+    
+    LIB_SUPABASE --> SUPABASE_INT
+    LIB_LLM --> AI_INT
+    LIB_EMAIL --> EMAIL_INT
+    DATA_CONFIG --> THEME_INT
+    
+    %% File Relationships
+    APP_API -.-> LIB_CONFIG
+    COMPONENTS -.-> DATA_FILES
+    LIB_CONFIG -.-> DATA_CONFIG
+    API_TEMPLATES -.-> LIB_SUPABASE
+    
+    %% Color Coding
+    classDef appStyle fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
+    classDef componentStyle fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
+    classDef libStyle fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
+    classDef dataStyle fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
+    classDef memoryStyle fill:#607D8B,stroke:#455A64,stroke-width:2px,color:#fff
+    classDef configStyle fill:#795548,stroke:#5D4037,stroke-width:2px,color:#fff
+    classDef integrationStyle fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
+    
+    class APP,APP_API,APP_PAGES,APP_LAYOUT appStyle
+    class COMPONENTS,UI_COMP,LAYOUT_COMP,MAIN_COMP componentStyle
+    class LIB,LIB_CONFIG,LIB_SUPABASE,LIB_SUBDIRS libStyle
+    class DATA,DATA_CONFIG,DATA_BLOG,DATA_FILES dataStyle
+    class MEMORY,MEMORY_DOCS memoryStyle
+    class CONFIG_FILES,PACKAGE_JSON,NEXT_CONFIG configStyle
+    class SUPABASE_INT,AI_INT,EMAIL_INT,THEME_INT integrationStyle

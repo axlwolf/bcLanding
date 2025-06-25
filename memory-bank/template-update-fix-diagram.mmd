@@ -1,0 +1,84 @@
+graph TB
+    subgraph "🔴 PROBLEMA ANTERIOR (Pre-Fix)"
+        USER1["👤 Usuario<br/>Cambia Template"]
+        FRONTEND1["🖥️ TemplateSelector<br/>Envía Request"]
+        API1["🔌 API Update<br/>dynamic='error'<br/>❌ Cache estático"]
+        SUPABASE1["🗄️ Supabase<br/>✅ Actualiza BD"]
+        PAGE1["📄 page.tsx<br/>❌ Caché stale<br/>Muestra template anterior"]
+        REFRESH1["🔄 Refresh Manual<br/>❌ Requerido"]
+        
+        USER1 --> FRONTEND1
+        FRONTEND1 --> API1
+        API1 --> SUPABASE1
+        SUPABASE1 -.-> PAGE1
+        PAGE1 --> REFRESH1
+    end
+    
+    subgraph "🟢 SOLUCIÓN IMPLEMENTADA (Post-Fix)"
+        USER2["👤 Usuario<br/>Cambia Template"]
+        FRONTEND2["🖥️ TemplateSelector<br/>Envía Request"]
+        API2["🔌 API Update<br/>✅ dynamic='force-dynamic'<br/>✅ revalidatePath('/')"]
+        SUPABASE2["🗄️ Supabase<br/>✅ Actualiza BD<br/>✅ No-cache headers"]
+        CONFIG2["⚙️ lib/config.ts<br/>✅ revalidatePath() adicional"]
+        PAGE2["📄 page.tsx<br/>✅ Cache invalidado<br/>✅ Update inmediato"]
+        SUCCESS2["✅ Template Cambiado<br/>Sin refresh manual"]
+        
+        USER2 --> FRONTEND2
+        FRONTEND2 --> API2
+        API2 --> SUPABASE2
+        API2 --> CONFIG2
+        SUPABASE2 --> PAGE2
+        CONFIG2 --> PAGE2
+        PAGE2 --> SUCCESS2
+    end
+    
+    subgraph "📋 CAMBIOS ESPECÍFICOS IMPLEMENTADOS"
+        CHANGE1["🔧 Change #1<br/>API Templates Route<br/>dynamic: 'error' → 'force-dynamic'"]
+        CHANGE2["🔧 Change #2<br/>API Update Route<br/>+ revalidatePath('/')<br/>+ revalidatePath('/app')"]
+        CHANGE3["🔧 Change #3<br/>lib/config.ts<br/>+ revalidatePath() en updateActiveTemplate()"]
+        CHANGE4["🔧 Change #4<br/>Supabase Client<br/>+ cache-control: no-cache<br/>+ realtime optimization"]
+    end
+    
+    subgraph "❌ RESULTADO: NO FUNCIONÓ"
+        ISSUE1["🚨 Posibles Causas"]
+        CACHE_ISSUE["💾 Next.js Cache<br/>Más agresivo<br/>de lo esperado"]
+        SSG_ISSUE["📄 Static Generation<br/>Conflict con dynamic"]
+        BUILD_ISSUE["🔨 Build Config<br/>Vercel/Production<br/>behaves differently"]
+        TIMING_ISSUE["⏱️ Race Condition<br/>revalidatePath timing"]
+        
+        ISSUE1 --> CACHE_ISSUE
+        ISSUE1 --> SSG_ISSUE
+        ISSUE1 --> BUILD_ISSUE
+        ISSUE1 --> TIMING_ISSUE
+    end
+    
+    subgraph "🔍 SIGUIENTE INVESTIGACIÓN"
+        NEXT1["🧪 Probar router.replace()<br/>en lugar de router.refresh()"]
+        NEXT2["🔄 Implementar window.location.reload()<br/>como fallback"]
+        NEXT3["📡 Real-time Supabase<br/>subscriptions para UI"]
+        NEXT4["🎯 Force-refresh mediante<br/>timestamp query params"]
+        NEXT5["🗂️ Investigar build config<br/>y static optimization"]
+    end
+    
+    %% Flow connections
+    CHANGE1 -.-> API2
+    CHANGE2 -.-> API2
+    CHANGE3 -.-> CONFIG2
+    CHANGE4 -.-> SUPABASE2
+    
+    %% Problem indicators
+    API1 -.->|"❌ No invalidation"| PAGE1
+    API2 -.->|"⚠️ Still not working"| ISSUE1
+    
+    %% Color coding
+    classDef problemStyle fill:#ffebee,stroke:#f44336,stroke-width:2px,color:#000
+    classDef solutionStyle fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000
+    classDef changeStyle fill:#e3f2fd,stroke:#2196f3,stroke-width:2px,color:#000
+    classDef issueStyle fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000
+    classDef nextStyle fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000
+    
+    class USER1,FRONTEND1,API1,SUPABASE1,PAGE1,REFRESH1 problemStyle
+    class USER2,FRONTEND2,API2,SUPABASE2,CONFIG2,PAGE2,SUCCESS2 solutionStyle
+    class CHANGE1,CHANGE2,CHANGE3,CHANGE4 changeStyle
+    class ISSUE1,CACHE_ISSUE,SSG_ISSUE,BUILD_ISSUE,TIMING_ISSUE issueStyle
+    class NEXT1,NEXT2,NEXT3,NEXT4,NEXT5 nextStyle

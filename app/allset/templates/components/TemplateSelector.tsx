@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { TemplateStorage } from '@/lib/templateStorage'
 
 // Define Template interface here to avoid server component imports in client component
 interface Template {
@@ -50,46 +51,85 @@ export default function TemplateSelector() {
     }
   }
 
+  // Effect for initial fetch
   useEffect(() => {
     fetchTemplates()
-  }, [])
+  }, []) // Solo ejecutar una vez al montar
 
-  // Handle template change
+  // Separate effect for cross-tab sync to avoid infinite loops
+  useEffect(() => {
+    if (templates.length === 0) return // Wait for templates to load
+
+    // Setup cross-tab synchronization
+    const cleanup = TemplateStorage.setupCrossTabSync((newTemplateId) => {
+      console.log('[TEMPLATE] Template changed in another tab:', newTemplateId)
+      setActiveTemplate(newTemplateId)
+      const templateName = templates.find((t) => t.id === newTemplateId)?.name || newTemplateId
+      setSuccess(`Template synchronized from another tab: "${templateName}"`)
+    })
+
+    // Cleanup on unmount
+    return cleanup
+  }, [templates.length]) // Only re-run when templates array length changes
+
+  // Handle template change with hybrid storage strategy
   const handleTemplateChange = async (templateId: string) => {
     setUpdating(true)
     setError('')
     setSuccess('')
 
     try {
-      const response = await fetch('/api/allset/templates/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ templateId }),
-      })
+      console.log('[TEMPLATE] Changing to:', templateId)
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Failed to update template')
-      }
+      // 1. IMMEDIATE: Update localStorage and UI state
+      const storageResult = await TemplateStorage.setActiveTemplate(templateId)
 
-      const data = await response.json()
+      if (storageResult.immediate) {
+        // Update local state immediately for UI feedback
+        setActiveTemplate(templateId)
+        const templateName = templates.find((t) => t.id === templateId)?.name
+        setSuccess(
+          `Template changed to "${templateName}". Changes will be visible on the home page.`
+        )
 
-      if (data.success) {
-        setSuccess('Template updated successfully!')
-        console.log('Refetching templates...')
-        await fetchTemplates()
-        setActiveTemplate(data.activeTemplate)
-        router.refresh() // Fuerza el refresco de la página principal para re-render SSR
-        setSuccess(`Template changed to "${templates.find((t) => t.id === templateId)?.name}"`)
+        console.log('[TEMPLATE] Template updated successfully. User remains in admin panel.')
       } else {
-        throw new Error(data.message || 'Failed to update template')
+        // Fallback to API-only approach if localStorage failed
+        console.log('[TEMPLATE] localStorage failed, using API-only approach...')
+        await fallbackToApiUpdate(templateId)
       }
     } catch (err) {
+      console.error('[TEMPLATE] Error updating template:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setUpdating(false)
+    }
+  }
+
+  // Fallback function for API-only update
+  const fallbackToApiUpdate = async (templateId: string) => {
+    const response = await fetch('/api/allset/templates/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ templateId }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.message || 'Failed to update template')
+    }
+
+    const data = await response.json()
+
+    if (data.success) {
+      setActiveTemplate(data.activeTemplate)
+      const templateName = templates.find((t) => t.id === templateId)?.name
+      setSuccess(`Template changed to "${templateName}". Changes will be visible on the home page.`)
+      console.log('[TEMPLATE] Template updated via API fallback. User remains in admin panel.')
+    } else {
+      throw new Error(data.message || 'Failed to update template')
     }
   }
 
@@ -117,8 +157,14 @@ export default function TemplateSelector() {
 
       {success && (
         <div className="mb-4 rounded-md bg-green-50 p-4 dark:bg-green-900/30">
-          <div className="flex">
+          <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-green-800 dark:text-green-400">{success}</div>
+            <button
+              onClick={() => window.open('/', '_blank')}
+              className="ml-4 rounded-md bg-green-100 px-3 py-1 text-xs font-medium text-green-800 hover:bg-green-200 dark:bg-green-800/50 dark:text-green-300 dark:hover:bg-green-700/50"
+            >
+              Preview Home ↗️
+            </button>
           </div>
         </div>
       )}
@@ -126,7 +172,8 @@ export default function TemplateSelector() {
       <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
         <div className="space-y-4">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Select the template to use for your site. Changes will be applied immediately.
+            Select the template to use for your site. Changes will be applied to the home page
+            immediately. Use the "Preview Home" button to view changes in a new tab.
           </p>
 
           <div className="grid gap-4 md:grid-cols-2">
