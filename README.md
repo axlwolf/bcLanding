@@ -1,4 +1,213 @@
-# AI-Powered Landing Page Generator
+# 📸 BoothieCall – Premium AI Landing Pages
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT 'MIT License')
+![GitHub repo size](https://img.shields.io/github/repo-size/axlwolf/boothiecall)
+[![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://github.com/axlwolf/boothiecall)
+[![Generic badge](https://img.shields.io/badge/lang-typescript-blue.svg)](https://www.typescriptlang.org/)
+[![Generic badge](https://img.shields.io/badge/framework-next.js%2014+-black.svg)](https://nextjs.org/)
+[![Generic badge](https://img.shields.io/badge/styles-tailwind%20css%203.4+-teal.svg)](https://tailwindcss.com/)
+[![Generic badge](https://img.shields.io/badge/ai-powered-yes-purple.svg)](https://github.com/axlwolf/boothiecall)
+[![Generic badge](https://img.shields.io/badge/last%20updated-06--2025-blue)](https://github.com/axlwolf/boothiecall)
+
+![BoothieCall Logo](public/logo.svg)
+
+BoothieCall es una landing page premium para renta de photo booth, enfocada en eventos de lujo y experiencia de usuario excepcional. Esta nueva versión está construida 100% en Next.js, integrando IA, microinteracciones avanzadas y las mejores prácticas de frontend moderno.
+
+> **Nota:** La documentación oficial y fuente de verdad vive en la carpeta `memory-bank`. El README es solo referencia rápida; cualquier cambio relevante debe reflejarse primero en los `.mdc` y `.md` de `memory-bank`.
+
+---
+
+## 🚀 Features
+
+- **Landing Page Modular:** Hero, features, galería, precios, testimonios, contacto
+- **Generación de contenido AI:** Textos y blogs SEO optimizados vía OpenAI, Gemini, Deepseek, Ollama
+- **Blog System:** Generación y edición de posts en MDX
+- **Panel Admin Ready:** Estructura para dashboard y gestión futura
+- **Animaciones premium:** Microinteracciones GSAP, scroll y hover, respetando accesibilidad
+- **Temas:** Light/dark y soporte para custom themes
+- **Mobile-first & Responsive:** Experiencia perfecta en cualquier dispositivo
+- **SEO avanzado:** Meta tags automáticos, performance óptima
+- **Internacionalización:** Español e inglés listos, adaptable a más idiomas
+- **Integraciones:** Analytics, email, CRM, newsletter
+
+---
+
+## 🏛️ Arquitectura
+
+BoothieCall es modular, extensible y AI-powered. Toda decisión arquitectónica se documenta en `memory-bank/architecture.md`.
+
+- **Next.js 14+**: App Router, server components, API routes
+- **Tailwind CSS**: Tematización rápida y consistente
+- **GSAP**: Animaciones y microinteracciones avanzadas
+- **Contentlayer/MDX**: Gestión de contenido y blog
+- **React Context/Zustand**: Estado global
+- **Jest, Playwright, Testing Library**: Testing robusto
+- **Supabase (futuro)**: Backend, auth y realtime
+- **Vercel**: Deploy principal, con Netlify/Railway como alternativas
+
+### Flujos principales
+
+- **Generación landing (AI):** Estructura JSON modular, bloques rearrangables, animaciones GSAP
+- **Blog AI:** Creación automática de posts SEO, estructura modular
+- **Recepción de leads y analítica:** Captura en tiempo real, notificaciones, integración con CRM/email
+- **Admin Panel:** Gestión de usuarios, roles, contenido y analítica
+- **Extensibilidad:** CLI, dashboard, plugins, multi-cloud y multi-LLM
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+```
+project-root/
+├── app/                     # App Router de Next.js
+│   ├── (landing)/           # Secciones principales (Hero, Features, Gallery...)
+│   ├── (blog)/              # Blog y posts MDX
+│   ├── (admin)/             # Panel admin (futuro)
+│   ├── api/                 # API routes (leads, emails, etc)
+│   └── layout.tsx           # Layout global
+├── components/              # Componentes UI reutilizables
+├── lib/                     # Utilidades, hooks, helpers, gsapUtils.ts
+├── public/                  # Assets estáticos (logo, imágenes, fuentes)
+├── styles/                  # Tailwind config, temas, CSS global
+├── memory-bank/             # 📚 Fuente de verdad (documentación viva)
+│   ├── activeContext.md
+│   ├── architecture.md
+│   ├── productContext.md
+│   ├── progress.md
+│   ├── projectbrief.md
+│   ├── systemPatterns.md
+│   ├── techContext.md
+│   └── ...
+├── tests/                   # Pruebas unitarias y E2E
+├── .env*                    # Variables de entorno
+├── package.json             # Dependencias y scripts
+└── README.md                # Esta referencia
+```
+
+---
+
+## 📚 Documentación y Fuente de Verdad
+
+La carpeta `memory-bank/` contiene:
+
+- **projectbrief.md:** Resumen y objetivos
+- **productContext.md:** Justificación, user journey, UX goals
+- **architecture.md:** Arquitectura modular y flujos
+- **techContext.md:** Stack y decisiones técnicas
+- **systemPatterns.md:** Patrones de desarrollo y batching
+- **progress.md:** Roadmap y milestones
+- **activeContext.md:** Estado actual del desarrollo
+
+> **Toda decisión relevante debe documentarse aquí antes de reflejarse en el código o el README.**
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- **Next.js 14+** (App Router, SSR/SSG, API routes)
+- **React 18**
+- **TypeScript**
+- **Tailwind CSS 3.4+**
+- **GSAP 3.12+** (microinteracciones, animaciones scroll/hover)
+- **Contentlayer/MDX** (blog y contenido)
+- **Zustand / React Context** (estado global)
+- **Jest, Playwright, Testing Library** (testing)
+- **Supabase** (futuro backend, auth, realtime)
+- **Vercel** (deploy principal)
+
+---
+
+## ⚡ Getting Started
+
+### Prerequisitos
+
+- Node.js 18+
+- npm o bun
+- API keys para proveedor LLM (OpenAI, Gemini, etc)
+
+### Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/axlwolf/boothiecall.git
+   cd boothiecall
+   ```
+2. Instala dependencias:
+   ```bash
+   npm install
+   # o
+   bun install
+   ```
+3. Copia el archivo de entorno:
+   ```bash
+   cp .env.example .env.local
+   ```
+4. Configura tus variables de entorno:
+   ```env
+   # LLM Providers
+   OPENAI_API_KEY=your_key_here
+   OPENAI_MODEL=gpt-4-turbo-preview
+   GEMINI_API_KEY=your_key_here
+   GEMINI_MODEL=gemini-pro
+   NEXT_PUBLIC_SITE_URL=your_site_url
+   ```
+5. Inicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   # o
+   bun run dev
+   ```
+
+---
+
+## 🎨 Temas y Microinteracciones
+
+- Soporte light/dark y temas personalizados (ver ThemeProvider y systemPatterns.md)
+- Animaciones GSAP en todas las secciones (Hero, Why, Gallery, Pricing, Testimonials, Contact, FAQ)
+- Hover effects y smooth scrolling
+- Todas las animaciones respetan `prefers-reduced-motion`
+
+---
+
+## 🧪 Testing
+
+- **Unit tests:** Jest + @testing-library/react
+- **E2E tests:** Playwright
+- **Visual regression:** (futuro)
+- **Patrón de batching:** Seguir systemPatterns.md para batches y pruebas
+- **Documentación:** Ver `memory-bank/progress.md` y `systemPatterns.md`
+
+---
+
+## 🚀 Deployment
+
+### Vercel
+
+- Root: raíz del repo (donde está package.json y app/)
+- Output: `.next` (detectado automáticamente)
+- public/: solo assets estáticos
+- Ventajas: deploy automático, CDN global, serverless, previews, analytics
+
+### Alternativas
+
+- **Netlify:** Ideal para sitios estáticos
+- **Railway:** Full-stack, base de datos incluida
+- **DigitalOcean App Platform:** Más control y configuración
+
+---
+
+## 📅 Roadmap
+
+1. **Fase 1:** Implementación Next.js (actual)
+2. **Fase 2:** Refactor admin dashboard y booking avanzado
+3. **Fase 3:** Headless CMS para edición rápida
+4. **Fase 4:** Optimización avanzada, internacionalización, AI features
+
+---
+
+## 🏷️ Licencia
+
+MIT. Ver LICENSE para detalles.
 
 A Next.js-based landing page generator that uses AI to create compelling content for your business or product. Generate landing pages and SEO-optimized blog posts with minimal effort.
 
