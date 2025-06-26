@@ -18,19 +18,18 @@ BoothieCall is a premium landing page generator for photo booth rentals, built w
 
 ## Recent Updates (2025-06-25)
 
+### ✅ Dynamic Site Settings & Content
+
+- **Dynamic Template**: The main site template now dynamically displays the site name and logo from Supabase.
+- **Global Settings Page**: A new settings page at `/allset/settings` allows admins to update the site name, description, and logo.
+- **Supabase Storage**: Logo uploads are now handled via a public `siteassets` bucket in Supabase.
+- **Unified API**: A single API endpoint (`/api/allset/settings`) now manages all site settings updates.
+
 ### ✅ Template Switching System
 
-- **Hybrid Architecture**: localStorage for immediate updates + Supabase for persistence
-- **Admin UX**: Template changes without leaving admin panel (`/allset/templates`)
-- **Cross-Tab Sync**: Changes propagate automatically between browser tabs
-- **SSR Compatible**: No hydration issues, consistent server-side rendering
-- **Preview Function**: "Preview Home" button to verify changes in new tab
-
-### ✅ Performance Optimizations
-
-- Fixed infinite API loops in template selector
-- Eliminated Next.js cache conflicts with hybrid client/server approach
-- Smooth transitions with loading states (50ms)
+- **Hybrid Architecture**: localStorage for immediate updates + Supabase for persistence.
+- **Admin UX**: Template changes without leaving admin panel (`/allset/templates`).
+- **Cross-Tab Sync**: Changes propagate automatically between browser tabs.
 
 ---
 
@@ -47,9 +46,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 1. **Clone & Install**: `npm install`
 2. **Environment**: Copy `.env.example` to `.env.local` and configure all required variables.
-3. **Database**: Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project to create the necessary tables.
-4. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure the required tables exist.
-5. **Start**: `npm run dev`
+3. **Database**: Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project. This will create the `site_config` table (for templates) and the `site_settings` table (for global settings).
+4. **Storage**: In your Supabase project, create a new **public** storage bucket named `siteassets`. Then, run the storage policy script from `VERCEL_SETUP.md` to allow public uploads.
+5. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure the required tables exist.
+6. **Start**: `npm run dev`
 
 ### Production Deployment
 
@@ -59,10 +59,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### Admin Panel
 
-1. **Admin Panel**: Navigate to `/allset/templates` for template management
-2. **Template Selection**: Choose template → changes apply instantly to home page
-3. **Preview**: Use "Preview Home" button to verify changes
-4. **Documentation**: See [memory-bank/](memory-bank/) for complete technical details
+1. **Template Management**: Navigate to `/allset/templates` to switch between site templates.
+2. **Site Settings**: Navigate to `/allset/settings` to update the site name, description, and logo.
+3. **Preview**: Use the "Preview Home" button in the template manager to verify changes.
+4. **Documentation**: See `memory-bank/` for complete technical details, including `lessons-learned.md`.
 
 ---
 

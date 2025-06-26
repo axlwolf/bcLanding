@@ -8,6 +8,13 @@ import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client for server-side fetching
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { DarkThemeProvider } from './theme-providers'
@@ -62,6 +69,21 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Fetch dynamic settings from Supabase
+  const { data: dynamicSettings } = await supabase
+    .from('site_settings')
+    .select('site_name, logo_url')
+    .eq('id', 1)
+    .single()
+
+  // Merge static metadata with dynamic settings
+  const finalSiteMetadata = {
+    ...siteMetadata,
+    title: dynamicSettings?.site_name || siteMetadata.title,
+    headerTitle: dynamicSettings?.site_name || siteMetadata.headerTitle,
+    logoUrl: dynamicSettings?.logo_url || siteMetadata.siteLogo,
+    stickyNav: siteMetadata.stickyNav, // Explicitly include for type safety
+  }
   const basePath = process.env.BASE_PATH || ''
 
   // Load theme settings during server rendering
@@ -103,7 +125,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <VercelAnalytics />
                   <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
                   <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-                    <Header />
+                    <Header siteMetadata={finalSiteMetadata} />
                     <main className="mb-auto">{children}</main>
                   </SearchProvider>
                   <Footer />

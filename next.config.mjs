@@ -61,7 +61,7 @@ const unoptimized = process.env.UNOPTIMIZED ? true : undefined
 /**
  * @type {import('next/dist/next-server/server/config').NextConfig}
  **/
-export default () => {
+const nextConfig = () => {
   const plugins = [withContentlayer, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), {
     basePath,
@@ -76,6 +76,10 @@ export default () => {
         {
           protocol: 'https',
           hostname: 'picsum.photos',
+        },
+        {
+          protocol: 'https',
+          hostname: 'wftxeiwoacxjhqulbotv.supabase.co',
         },
       ],
       unoptimized,
@@ -98,3 +102,5 @@ export default () => {
     },
   })
 }
+
+export default nextConfig
