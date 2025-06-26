@@ -88,6 +88,24 @@
 
 ---
 
+## 2024-06-25
+
+### Added
+
+- **Dynamic Site Settings**: Created a new settings page at `/allset/settings` to manage global site configuration.
+- **Unified Settings API**: Implemented a new API endpoint at `/api/allset/settings` to handle saving site name, description, email, and logo uploads to Supabase.
+- **Supabase Integration**: The root layout now fetches site name and logo URL from the `site_settings` table in Supabase, making the main template dynamic.
+- **Lessons Learned Documentation**: Added `memory-bank/lessons-learned.md` to document key technical insights from the Supabase integration.
+
+### Fixed
+
+- **Settings Not Updating**: The settings page now fetches existing data from Supabase on load, ensuring the form is always up-to-date.
+- **Template Not Updating**: The main site template now correctly displays the dynamic site name and logo from the settings.
+- **Image Loading Error**: Added the Supabase storage domain to `next.config.mjs` to allow external images.
+- **Linting Errors**: Corrected various linting errors in `next.config.mjs` and `settings/page.tsx`.
+
+---
+
 ## 2025-06-24
 
 ### Supabase Template Sync Migration

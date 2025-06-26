@@ -1,5 +1,4 @@
 'use client'
-import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import Logo from '@/data/logo2.png'
 
@@ -13,7 +12,16 @@ import { LandingContent } from 'app/allset/landing-content/types'
 
 const landingContent = dataLandingContent as LandingContent
 
-const Header = () => {
+interface HeaderProps {
+  siteMetadata: {
+    headerTitle: string
+    logoUrl?: string
+    siteLogo: string
+    stickyNav: boolean
+  }
+}
+
+const Header = ({ siteMetadata }: HeaderProps) => {
   let headerClass =
     'flex items-center w-full bg-slate-100 dark:bg-slate-900 dark:text-slate-200 justify-between py-10 mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-10/12 xl:px-0'
   if (siteMetadata.stickyNav) {
@@ -35,16 +43,11 @@ const Header = () => {
     return true
   })
   // Use logo from siteMetadata (always string)
-  let logoSrc: string
-  if (typeof siteMetadata.siteLogo === 'string') {
-    logoSrc = siteMetadata.siteLogo
-  } else if (typeof Logo === 'string') {
-    logoSrc = Logo
-  } else if (Logo && typeof Logo === 'object' && 'src' in Logo) {
-    logoSrc = Logo.src as string
-  } else {
-    logoSrc = '/static/images/logo2.png'
-  }
+  const logoSrc =
+    siteMetadata.logoUrl ||
+    siteMetadata.siteLogo ||
+    (Logo && Logo.src) ||
+    '/static/images/logo2.png'
 
   return (
     <header className={headerClass}>

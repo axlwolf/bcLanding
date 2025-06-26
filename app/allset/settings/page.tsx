@@ -1,19 +1,62 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function SettingsPage() {
+  const [isLoading, setIsLoading] = useState(true)
   const [generalSettings, setGeneralSettings] = useState({
-    siteName: 'AllSet Template',
-    siteDescription: 'A modern template for Next.js applications',
-    adminEmail: 'admin@example.com',
+    siteName: '',
+    siteDescription: '',
+    adminEmail: '',
   })
 
   // Logo state
   const [logoPreview, setLogoPreview] = useState<string>('')
   const [logoFileName, setLogoFileName] = useState<string>('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('*')
+          .eq('id', 1)
+          .single()
+
+        if (error) {
+          throw new Error(
+            'Failed to fetch settings. Please ensure the settings table is set up correctly.'
+          )
+        }
+
+        if (data) {
+          setGeneralSettings({
+            siteName: data.site_name || '',
+            siteDescription: data.site_description || '',
+            adminEmail: data.admin_email || '',
+          })
+          if (data.logo_url) {
+            setLogoPreview(data.logo_url)
+          }
+        }
+      } catch (error) {
+        setSaveMessage(`Error: ${(error as Error).message}`)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSettings()
+  }, [])
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0]
@@ -38,27 +81,39 @@ export default function SettingsPage() {
     setIsSaving(true)
     setSaveMessage('')
 
-    const formData = new FormData()
-    if (logoFile) {
-      formData.append('logo', logoFile)
-    }
+    try {
+      const formData = new FormData()
+      formData.append('siteName', generalSettings.siteName)
+      formData.append('siteDescription', generalSettings.siteDescription)
+      formData.append('adminEmail', generalSettings.adminEmail)
 
-    // POST to /api/logo
-    const resp = await fetch('/api/logo', {
-      method: 'POST',
-      body: formData,
-    })
-    const data = await resp.json()
-    if (data.success) {
-      setSaveMessage('Logo updated!')
-      setLogoPreview(data.logoUrl)
-      setLogoFileName('')
-      setLogoFile(null)
-    } else {
-      setSaveMessage('Error updating logo: ' + (data.error || 'Unknown error'))
+      if (logoFile) {
+        formData.append('logo', logoFile)
+      }
+
+      const response = await fetch('/api/allset/settings', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setSaveMessage('Settings updated successfully!')
+        if (data.newLogoUrl) {
+          setLogoPreview(data.newLogoUrl)
+        }
+        setLogoFile(null)
+        setLogoFileName('')
+      } else {
+        throw new Error(data.error || 'An unknown error occurred.')
+      }
+    } catch (error) {
+      setSaveMessage(`Error: ${(error as Error).message}`)
+    } finally {
+      setIsSaving(false)
+      setTimeout(() => setSaveMessage(''), 5000)
     }
-    setIsSaving(false)
-    setTimeout(() => setSaveMessage(''), 3000)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,6 +122,14 @@ export default function SettingsPage() {
       ...prev,
       [name]: value,
     }))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-lg">Loading settings...</p>
+      </div>
+    )
   }
 
   return (
