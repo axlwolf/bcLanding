@@ -36,6 +36,28 @@ BoothieCall is a premium landing page generator for photo booth rentals, built w
 
 ## Quick Start
 
+### Environment Variables Required
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Development Setup
+
+1. **Clone & Install**: `npm install`
+2. **Environment**: Copy `.env.example` to `.env.local` and configure Supabase variables
+3. **Database**: Run SQL setup from `VERCEL_SETUP.md`
+4. **Start**: `npm run dev`
+
+### Production Deployment
+
+1. **Vercel Setup**: See `VERCEL_SETUP.md` for complete deployment guide
+2. **Environment Variables**: Configure in Vercel Dashboard
+3. **Database**: Ensure Supabase `site_config` table exists
+
+### Admin Panel
+
 1. **Admin Panel**: Navigate to `/allset/templates` for template management
 2. **Template Selection**: Choose template → changes apply instantly to home page
 3. **Preview**: Use "Preview Home" button to verify changes

@@ -1,5 +1,15 @@
 import { supabase } from './supabaseClient'
 
+// Runtime check for Supabase configuration
+function checkSupabaseConfig() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase configuration missing. Please check environment variables.')
+  }
+}
+
 export interface Template {
   id: string
   name: string
@@ -15,6 +25,28 @@ export interface SiteConfig {
  * Get the site configuration from Supabase
  */
 export async function getSiteConfigFromSupabase(): Promise<SiteConfig> {
+  try {
+    checkSupabaseConfig()
+  } catch (error) {
+    console.warn('[CONFIG] Supabase not configured, using fallback')
+    // Fallback to default config
+    return {
+      activeTemplate: 'Main',
+      availableTemplates: [
+        {
+          id: 'Main',
+          name: 'Default Template',
+          description: 'The default layout with standard spacing and container widths',
+        },
+        {
+          id: 'Main2',
+          name: 'Alternative Template',
+          description: 'Alternative layout option',
+        },
+      ],
+    }
+  }
+
   const { data, error } = await supabase
     .from('site_config')
     .select('value')
@@ -32,6 +64,11 @@ export async function getSiteConfigFromSupabase(): Promise<SiteConfig> {
           name: 'Default Template',
           description: 'The default layout with standard spacing and container widths',
         },
+        {
+          id: 'Main2',
+          name: 'Alternative Template',
+          description: 'Alternative layout option',
+        },
       ],
     }
   }
@@ -44,6 +81,13 @@ export async function getSiteConfigFromSupabase(): Promise<SiteConfig> {
  * Update the site configuration in Supabase
  */
 export async function updateSiteConfigInSupabase(config: Partial<SiteConfig>): Promise<SiteConfig> {
+  try {
+    checkSupabaseConfig()
+  } catch (error) {
+    console.warn('[CONFIG] Supabase not configured, cannot update config')
+    throw new Error('Cannot update configuration: Supabase not configured')
+  }
+
   // Read current config from Supabase
   const currentConfig = await getSiteConfigFromSupabase()
   const updatedConfig = {

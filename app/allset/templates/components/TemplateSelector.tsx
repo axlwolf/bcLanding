@@ -70,7 +70,7 @@ export default function TemplateSelector() {
 
     // Cleanup on unmount
     return cleanup
-  }, [templates.length]) // Only re-run when templates array length changes
+  }, [templates, templates.length]) // Only re-run when templates array length changes
 
   // Handle template change with hybrid storage strategy
   const handleTemplateChange = async (templateId: string) => {

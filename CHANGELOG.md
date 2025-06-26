@@ -1,5 +1,48 @@
 # Changelog
 
+## 2025-06-25 (Latest)
+
+### Vercel Deployment Error Fixes
+
+**🐛 BUG FIXES: Resolved 401 and 500 Errors in Production**
+
+- **Fixed 401 Unauthorized Error on `/static/favicons/site.webmanifest`**
+  - Created `vercel.json` configuration file with proper headers for static assets
+  - Added Cache-Control and CORS headers for favicon files
+  - Updated middleware to explicitly allow public paths
+  - Improved static file serving configuration
+
+- **Fixed 500 Internal Server Error on `/api/allset/templates/update`**
+  - Enhanced error handling with descriptive error messages
+  - Added environment variable validation before Supabase operations
+  - Implemented proper error categorization (CONFIG_ERROR, TABLE_NOT_FOUND, CONNECTION_ERROR)
+  - Added OPTIONS handler for CORS support
+  - Improved logging for better debugging
+
+**🛠 Development Tools**
+
+- Created `scripts/verify-supabase.mjs` for connection verification
+  - Validates Supabase environment variables
+  - Tests database connectivity
+  - Provides SQL setup instructions if tables are missing
+  - Added npm script: `npm run verify-supabase`
+
+**📚 Documentation**
+
+- Added `TROUBLESHOOTING_VERCEL.md` with detailed error resolution guide
+- Documented required environment variables for Vercel deployment
+- Included step-by-step instructions for Supabase table setup
+- Added debugging tips and common solutions
+
+**🔧 Configuration Updates**
+
+- Updated `middleware.ts` with improved public path handling
+- Enhanced `next.config.mjs` security headers
+- Added `vercel.json` for deployment-specific settings
+- Improved API route configuration with `dynamic = 'force-dynamic'`
+
+---
+
 ## 2025-06-25
 
 ### Template Switching System - Hybrid Architecture Implementation

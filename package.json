@@ -11,7 +11,8 @@
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
     "prepare": "husky",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md,mdx}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md,mdx}\"",
+    "verify-supabase": "node scripts/verify-supabase.mjs"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
