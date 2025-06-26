@@ -37,7 +37,13 @@
 ### **🛠️ Development Tools Created**
 
 - ✅ **Supabase Verification Script**: Tests connection and provides setup instructions
-- ✅ **Enhanced Error Messages**: Specific error codes for debugging
+- ✅ **Enhanced Error Messages**: Specific, structured error responses for easier debugging.
+
+### **✅ Middleware Fix**
+
+- ✅ **Issue**: `401 Unauthorized` error for static files (`site.webmanifest`) on Vercel deployments.
+- ✅ **Root Cause**: The Next.js middleware was incorrectly intercepting requests for public static assets.
+- ✅ **Solution**: Updated the `matcher` in `middleware.ts` to explicitly exclude the `/static` folder, ensuring the middleware only runs on page and API routes.fic error codes for debugging
 - ✅ **CORS Support**: Added OPTIONS handler to API routes
 - ✅ **Documentation**: Created `TROUBLESHOOTING_VERCEL.md`
 

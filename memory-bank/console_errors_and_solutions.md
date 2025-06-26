@@ -73,6 +73,41 @@ Failed to fetch dynamically imported module: http://localhost:4321/src/component
 
 ---
 
+## 7. 401 Unauthorized
+
+```
+401 Unauthorized
+```
+
+**Causa:** Credenciales de Supabase incorrectas o no configuradas correctamente.  
+**Solución:** Asegúrate de que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén correctamente configurados en tu archivo local `.env.local` y en las variables de entorno del proyecto de Vercel para todos los entornos (Producción, Previsualización y Desarrollo). Utiliza el script `npm run verify-supabase` para probar tu conexión local antes de desplegar.
+
+---
+
+## 8. 401 Unauthorized for Static Files on Vercel
+
+- **Symptom**: After a successful build, the deployed Vercel site fails to load static assets like `site.webmanifest`, showing a `401 Unauthorized` error in the browser console.
+- **Root Cause**: The `middleware.ts` file is configured to run on too many paths. Its `matcher` is not correctly excluding the `/static` directory, causing the middleware to incorrectly apply authentication logic to public assets.
+- **Solution**: Modify the `config.matcher` in `middleware.ts` to explicitly ignore the `/static` directory. This prevents the middleware from intercepting requests for public static files.
+
+**Before:**
+
+```javascript
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+}
+```
+
+**After:**
+
+```javascript
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|static|favicon.ico).*)'],
+}
+```
+
+---
+
 **IMPORTANTE:**
 
 - Si ves estos errores, revisa este archivo antes de debuggear.

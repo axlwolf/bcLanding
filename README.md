@@ -46,9 +46,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ### Development Setup
 
 1. **Clone & Install**: `npm install`
-2. **Environment**: Copy `.env.example` to `.env.local` and configure Supabase variables
-3. **Database**: Run SQL setup from `VERCEL_SETUP.md`
-4. **Start**: `npm run dev`
+2. **Environment**: Copy `.env.example` to `.env.local` and configure all required variables.
+3. **Database**: Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project to create the necessary tables.
+4. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure the required tables exist.
+5. **Start**: `npm run dev`
 
 ### Production Deployment
 
