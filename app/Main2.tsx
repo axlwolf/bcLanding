@@ -32,12 +32,16 @@ async function getLandingContentData(slug: string): Promise<ProductSaaSLandingCo
       cache: 'no-store',
     })
     if (!res.ok) {
-      console.error(`Failed to fetch landing content (Main2) for slug ${slug}: ${res.status} ${res.statusText}`)
+      console.error(
+        `Failed to fetch landing content (Main2) for slug ${slug}: ${res.status} ${res.statusText}`
+      )
       return null
     }
     const data = await res.json()
     if (data.pageType !== 'product' && data.pageType !== 'saas') {
-        console.warn(`Fetched content for Main2 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`)
+      console.warn(
+        `Fetched content for Main2 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`
+      )
     }
     return data as ProductSaaSLandingContent
   } catch (error) {
@@ -45,7 +49,6 @@ async function getLandingContentData(slug: string): Promise<ProductSaaSLandingCo
     return null
   }
 }
-
 
 const imageMap = {
   landingDemoImage: landingDemoImage,
@@ -61,13 +64,11 @@ const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSec
   // Effect to update selectedFeature if mainFeatures.items itself changes or on initial load
   useEffect(() => {
     if (mainFeatures?.items?.length > 0) {
-      setSelectedFeature(mainFeatures.items[0]);
+      setSelectedFeature(mainFeatures.items[0])
     }
-  }, [mainFeatures]);
+  }, [mainFeatures])
 
-
-  if (!mainFeatures?.items?.length) return null;
-
+  if (!mainFeatures?.items?.length) return null
 
   return (
     <section
@@ -131,7 +132,9 @@ const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
-              {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
+              {hero.title?.split(' ')[0] && (
+                <span className="text-primary-500">{hero.title.split(' ')[0]}</span>
+              )}{' '}
               <span className="text-slate-900 dark:text-white">
                 {hero.title?.split(' ').slice(1).join(' ')}
               </span>
@@ -221,7 +224,7 @@ const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
                   <div className="w-full overflow-hidden rounded-lg shadow-xl">
                     <Image
                       src={hero.image || landingDemoImage} // Fallback for hero image
-                      alt={hero.title || "AI Landing Page Generator Demo"}
+                      alt={hero.title || 'AI Landing Page Generator Demo'}
                       width={1024}
                       height={576}
                       className="h-auto w-full"
@@ -629,24 +632,27 @@ import Main2ContactSection from './Main2ContactSection' // Assuming this is alre
 // Main2 becomes an async Server Component
 export default async function Main2() {
   // Fetch landing content. Using "main-landing" for now, this could be specific like "main2-landing"
-  const landingContent = await getLandingContentData('main-landing');
+  const landingContent = await getLandingContentData('main-landing')
 
   if (!landingContent) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
-        <p className="text-lg text-red-500">Failed to load content for Main2 page. Please try again later.</p>
+        <p className="text-lg text-red-500">
+          Failed to load content for Main2 page. Please try again later.
+        </p>
       </div>
-    );
+    )
   }
 
   // Destructure content safely, providing fallbacks if a section might be optional
-  const { hero, mainFeatures, features, cta, gallery, pricing, faqs, contact } = landingContent;
+  const { hero, mainFeatures, features, cta, gallery, pricing, faqs, contact } = landingContent
 
   return (
     <>
       <main className="flex-auto">
         {hero && <HeroSection hero={hero} />}
-        {mainFeatures && <FeaturesSectionClient mainFeatures={mainFeatures} />} {/* Use client version */}
+        {mainFeatures && <FeaturesSectionClient mainFeatures={mainFeatures} />}{' '}
+        {/* Use client version */}
         {features && <SecondaryFeaturesSection features={features} />}
         {cta && <CTASectionClient cta={cta} />} {/* Use client version */}
         {gallery && <GallerySectionClient gallery={gallery} />} {/* Use client version */}

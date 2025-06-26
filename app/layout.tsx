@@ -50,7 +50,10 @@ async function getLandingContentForHeader(slug: string): Promise<LandingContent 
       .order('display_order', { ascending: true })
 
     if (sectionsError) {
-      console.error(`Header: Error fetching page content for page_id ${pageData.id}:`, sectionsError.message)
+      console.error(
+        `Header: Error fetching page content for page_id ${pageData.id}:`,
+        sectionsError.message
+      )
       return null
     }
 
@@ -166,7 +169,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
                   <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
                     {/* Pass fetched landingContent to Header */}
-                    <Header siteMetadata={finalSiteMetadata} landingContent={headerLandingContent} />
+                    <Header
+                      siteMetadata={finalSiteMetadata}
+                      landingContent={headerLandingContent}
+                    />
                     <main className="mb-auto">{children}</main>
                   </SearchProvider>
                   <Footer />

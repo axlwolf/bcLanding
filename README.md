@@ -56,9 +56,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 1. **Clone & Install**: `npm install`
 2. **Environment**: Copy `.env.example` to `.env.local` and configure all required variables.
 3. **Database**:
-    - Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project. This will create the `site_config` table (for templates) and the `site_settings` table (for global settings).
-    - Run the SQL DDL provided in the `memory-bank` (or commit history) to create the `landing_pages` and `page_content` tables for dynamic landing page content.
-    - After table creation, run `npm run db:migrate-landing-content` to populate these tables with initial content from the (now deleted) `data/landingContent.json`.
+   - Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project. This will create the `site_config` table (for templates) and the `site_settings` table (for global settings).
+   - Run the SQL DDL provided in the `memory-bank` (or commit history) to create the `landing_pages` and `page_content` tables for dynamic landing page content.
+   - After table creation, run `npm run db:migrate-landing-content` to populate these tables with initial content from the (now deleted) `data/landingContent.json`.
 4. **Storage**: In your Supabase project, create a new **public** storage bucket named `siteassets`. Then, run the storage policy script from `VERCEL_SETUP.md` to allow public uploads.
 5. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure all required tables exist (`site_config`, `site_settings`, `landing_pages`, `page_content`).
 6. **Start**: `npm run dev`

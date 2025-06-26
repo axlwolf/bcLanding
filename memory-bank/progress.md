@@ -385,34 +385,34 @@ const supabase = createClient(
 
 - ✅ **Goal**: Migrate landing page content from `data/landingContent.json` to Supabase to enable dynamic content management and Vercel compatibility.
 - ✅ **Supabase Schema**:
-    - Created `landing_pages` table for page metadata (slug, page_type, name).
-    - Created `page_content` table to store individual page sections as JSONB, linked to `landing_pages`.
+  - Created `landing_pages` table for page metadata (slug, page_type, name).
+  - Created `page_content` table to store individual page sections as JSONB, linked to `landing_pages`.
 - ✅ **Data Migration**:
-    - Developed `scripts/migrateLandingContent.js` to read `data/landingContent.json` and populate the new Supabase tables.
-    - Successfully migrated content for a default "main-landing" page.
+  - Developed `scripts/migrateLandingContent.js` to read `data/landingContent.json` and populate the new Supabase tables.
+  - Successfully migrated content for a default "main-landing" page.
 - ✅ **API Refactoring**:
-    - Modified `GET /api/allset/landing-content` to fetch and reconstruct landing page content from Supabase, defaulting to "main-landing" slug.
-    - Modified `POST /api/allset/landing-content` to save full landing page content to Supabase by upserting sections into `page_content` and updating `landing_pages.page_type` if changed.
-    - Updated `GET /api/allset/generate-content` to save AI-generated content to Supabase.
-    - Updated `POST /api/allset/generate-blog-titles` to fetch context from Supabase.
-    - Changed `export const dynamic = 'error'` to `export const dynamic = 'force-dynamic'` in affected API routes.
+  - Modified `GET /api/allset/landing-content` to fetch and reconstruct landing page content from Supabase, defaulting to "main-landing" slug.
+  - Modified `POST /api/allset/landing-content` to save full landing page content to Supabase by upserting sections into `page_content` and updating `landing_pages.page_type` if changed.
+  - Updated `GET /api/allset/generate-content` to save AI-generated content to Supabase.
+  - Updated `POST /api/allset/generate-blog-titles` to fetch context from Supabase.
+  - Changed `export const dynamic = 'error'` to `export const dynamic = 'force-dynamic'` in affected API routes.
 - ✅ **Frontend Refactoring (Content Display)**:
-    - `app/Main.tsx` (and conceptually `Main2-6.tsx`):
-        - Converted to async Server Components.
-        - Removed static JSON imports.
-        - Now fetch data from `/api/allset/landing-content` for the "main-landing" slug.
-        - Client-interactive sub-components refactored to receive data via props and marked with `'use client'`.
-    - `components/Header.tsx` & `app/layout.tsx`:
-        - `app/layout.tsx` now fetches content for "main-landing".
-        - `Header.tsx` receives this content via props to dynamically filter navigation links.
+  - `app/Main.tsx` (and conceptually `Main2-6.tsx`):
+    - Converted to async Server Components.
+    - Removed static JSON imports.
+    - Now fetch data from `/api/allset/landing-content` for the "main-landing" slug.
+    - Client-interactive sub-components refactored to receive data via props and marked with `'use client'`.
+  - `components/Header.tsx` & `app/layout.tsx`:
+    - `app/layout.tsx` now fetches content for "main-landing".
+    - `Header.tsx` receives this content via props to dynamically filter navigation links.
 - ✅ **Frontend Refactoring (Content Editor)**:
-    - `app/allset/landing-content/page.tsx`:
-        - Existing fetch/save logic remains largely compatible with the updated API for the default "main-landing" page.
-        - Expected to resolve previous issues with page type display and reset functionality due to consistent backend.
+  - `app/allset/landing-content/page.tsx`:
+    - Existing fetch/save logic remains largely compatible with the updated API for the default "main-landing" page.
+    - Expected to resolve previous issues with page type display and reset functionality due to consistent backend.
 - ✅ **Cleanup**:
-    - Deleted `data/landingContent.json`.
-    - Ensured no active runtime code directly references the old JSON file.
+  - Deleted `data/landingContent.json`.
+  - Ensured no active runtime code directly references the old JSON file.
 - ✅ **Vercel Compatibility**: The primary goal of moving content management to a database to work with Vercel's read-only filesystem has been achieved for landing page content.
 - 🔮 **Future Considerations for Editor**:
-    - UI for selecting/managing multiple landing pages (different slugs).
-    - Potentially more dynamic form rendering in `FormEditor.tsx` based on `pageType`.
+  - UI for selecting/managing multiple landing pages (different slugs).
+  - Potentially more dynamic form rendering in `FormEditor.tsx` based on `pageType`.

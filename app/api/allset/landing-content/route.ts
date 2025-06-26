@@ -5,6 +5,16 @@ import { supabase } from '@/lib/supabaseClient' // Assuming supabase client is i
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Disable caching for this route
 
+// Define an interface for the objects being pushed into sectionsToUpsert
+// This should match the structure of the page_content table rows for upserting
+interface PageContentSectionUpsert {
+  page_id: string | number // Assuming pageData.id could be string or number
+  section_slug: string
+  content: any // Content can be any JSON structure
+  display_order: number
+  is_active: boolean
+}
+
 const DEFAULT_LANDING_PAGE_SLUG = 'main-landing'
 
 export async function GET(request: NextRequest) {
@@ -22,8 +32,12 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (pageError) {
-      if (pageError.code === 'PGRST116') { // Not found
-        return NextResponse.json({ message: `Landing page with slug '${slug}' not found.` }, { status: 404 })
+      if (pageError.code === 'PGRST116') {
+        // Not found
+        return NextResponse.json(
+          { message: `Landing page with slug '${slug}' not found.` },
+          { status: 404 }
+        )
       }
       console.error(`Error fetching landing page for slug ${slug}:`, pageError)
       throw pageError
@@ -82,15 +96,18 @@ export async function POST(request: NextRequest) {
 
     if (pageFetchError) {
       if (pageFetchError.code === 'PGRST116') {
-        return NextResponse.json({ message: `Landing page with slug '${slug}' not found. Cannot save content.` }, { status: 404 })
+        return NextResponse.json(
+          { message: `Landing page with slug '${slug}' not found. Cannot save content.` },
+          { status: 404 }
+        )
       }
       console.error(`Error fetching landing page for slug ${slug}:`, pageFetchError)
       throw pageFetchError
     }
 
-    const pageId = pageData.id;
-    const currentPageType = pageData.page_type;
-    const newPageType = contentData.pageType;
+    const pageId = pageData.id
+    const currentPageType = pageData.page_type
+    const newPageType = contentData.pageType
 
     // Start a transaction
     // Note: Supabase JS client doesn't directly support transactions like SQL.
@@ -103,20 +120,20 @@ export async function POST(request: NextRequest) {
       const { error: updatePageTypeError } = await supabase
         .from('landing_pages')
         .update({ page_type: newPageType, updated_at: new Date().toISOString() })
-        .eq('id', pageId);
+        .eq('id', pageId)
       if (updatePageTypeError) {
-        console.error(`Error updating page_type for pageId ${pageId}:`, updatePageTypeError);
-        throw updatePageTypeError;
+        console.error(`Error updating page_type for pageId ${pageId}:`, updatePageTypeError)
+        throw updatePageTypeError
       }
-      console.log(`Updated page_type to '${newPageType}' for pageId ${pageId}`);
+      console.log(`Updated page_type to '${newPageType}' for pageId ${pageId}`)
     }
 
     // 3. Upsert sections into page_content
-    const sectionsToUpsert = [];
-    let displayOrder = 0;
+    const sectionsToUpsert: PageContentSectionUpsert[] = []
+    let displayOrder = 0
     for (const sectionSlug in contentData) {
       if (sectionSlug === 'pageType') {
-        continue;
+        continue
       }
       if (Object.prototype.hasOwnProperty.call(contentData, sectionSlug)) {
         sectionsToUpsert.push({
@@ -126,37 +143,38 @@ export async function POST(request: NextRequest) {
           display_order: displayOrder++,
           is_active: true,
           // updated_at will be set by the trigger
-        });
+        })
       }
     }
 
     if (sectionsToUpsert.length > 0) {
-        // To perform an upsert that updates existing records and inserts new ones,
-        // we specify the conflict target. If a row with the same page_id and section_slug
-        // exists, it will be updated. Otherwise, a new row is inserted.
-        const { error: upsertError } = await supabase
-            .from('page_content')
-            .upsert(sectionsToUpsert, {
-                onConflict: 'page_id,section_slug',
-                // defaultToNull: false, // Keep existing values for columns not specified in the upsert, if applicable
-            });
+      // To perform an upsert that updates existing records and inserts new ones,
+      // we specify the conflict target. If a row with the same page_id and section_slug
+      // exists, it will be updated. Otherwise, a new row is inserted.
+      const { error: upsertError } = await supabase.from('page_content').upsert(sectionsToUpsert, {
+        onConflict: 'page_id,section_slug',
+        // defaultToNull: false, // Keep existing values for columns not specified in the upsert, if applicable
+      })
 
-        if (upsertError) {
-            console.error(`Error upserting page content for pageId ${pageId}:`, upsertError)
-            throw upsertError
-        }
-        console.log(`Successfully upserted ${sectionsToUpsert.length} sections for pageId ${pageId}.`);
+      if (upsertError) {
+        console.error(`Error upserting page content for pageId ${pageId}:`, upsertError)
+        throw upsertError
+      }
+      console.log(`Successfully upserted ${sectionsToUpsert.length} sections for pageId ${pageId}.`)
     }
 
     // Optionally, update the landing_page's updated_at timestamp if not handled by page_type update
     if (!(newPageType && newPageType !== currentPageType) && sectionsToUpsert.length > 0) {
-         const { error: updatePageTimestampError } = await supabase
+      const { error: updatePageTimestampError } = await supabase
         .from('landing_pages')
         .update({ updated_at: new Date().toISOString() })
-        .eq('id', pageId);
+        .eq('id', pageId)
       if (updatePageTimestampError) {
         // Log this error but don't necessarily fail the whole operation if content was saved
-        console.warn(`Could not update landing_pages.updated_at for pageId ${pageId}:`, updatePageTimestampError);
+        console.warn(
+          `Could not update landing_pages.updated_at for pageId ${pageId}:`,
+          updatePageTimestampError
+        )
       }
     }
 

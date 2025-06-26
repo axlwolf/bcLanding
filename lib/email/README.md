@@ -104,18 +104,15 @@ Email templates are located in the `templates/emails` directory. The base layout
 #### Available Templates
 
 1. **Welcome Email** (`welcome`)
-
    - For new user onboarding
    - Required data: `name`, `welcomeMessage`, `ctaUrl`, `ctaText`
 
 2. **Newsletter** (`newsletter`)
-
    - For sending newsletters and updates
    - Required data: `name`, `content`, `ctaUrl`, `ctaText`
    - Optional: `featuredImage`, `showUnsubscribe`
 
 3. **Ebook Delivery** (`ebook-delivery`)
-
    - For delivering digital products like ebooks
    - Required data: `name`, `ebookTitle`, `downloadUrl`
    - Optional: `ebookDescription`, `ebookCover`, `expiryNotice`, `additionalContent`

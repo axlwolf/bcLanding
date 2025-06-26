@@ -18,7 +18,8 @@ async function fetchLandingContentFromSupabase(slug: string) {
     .single()
 
   if (pageError) {
-    if (pageError.code === 'PGRST116') { // Not found
+    if (pageError.code === 'PGRST116') {
+      // Not found
       console.error(`Landing page with slug '${slug}' not found for blog title generation.`)
       throw new Error(`Landing page with slug '${slug}' not found.`)
     }
@@ -34,7 +35,10 @@ async function fetchLandingContentFromSupabase(slug: string) {
     .order('display_order', { ascending: true })
 
   if (sectionsError) {
-    console.error(`Error fetching page content for page_id ${pageData.id} (blog titles):`, sectionsError)
+    console.error(
+      `Error fetching page content for page_id ${pageData.id} (blog titles):`,
+      sectionsError
+    )
     throw sectionsError
   }
 
@@ -48,7 +52,8 @@ async function fetchLandingContentFromSupabase(slug: string) {
   return reconstructedContent
 }
 
-export async function POST(request: NextRequest) { // POST request seems more appropriate if it's initiating an action
+export async function POST(request: NextRequest) {
+  // POST request seems more appropriate if it's initiating an action
   try {
     // Expect a targetSlug in the request body, or use default
     // const { targetSlug } = await request.json(); // If you want to specify via request body

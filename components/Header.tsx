@@ -8,7 +8,11 @@ import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 import Image from 'next/image'
 // import dataLandingContent from '@/data/landingContent.json' // Removed
-import { LandingContent, ProductSaaSLandingContent, YouTubeLandingContent } from 'app/allset/landing-content/types' // Ensure all necessary types are imported
+import {
+  LandingContent,
+  ProductSaaSLandingContent,
+  YouTubeLandingContent,
+} from 'app/allset/landing-content/types' // Ensure all necessary types are imported
 
 // const landingContent = dataLandingContent as LandingContent // Removed
 
@@ -31,24 +35,25 @@ const Header = ({ siteMetadata, landingContent }: HeaderProps) => {
 
   // Filter navLinks based on the passed landingContent
   const navLinks = headerNavLinks.filter((link) => {
-    if (!landingContent) { // If no content, show all links or a default set
-      return true; // Or apply some default filtering logic
+    if (!landingContent) {
+      // If no content, show all links or a default set
+      return true // Or apply some default filtering logic
     }
     if (landingContent.pageType === 'product' || landingContent.pageType === 'saas') {
-      const content = landingContent as ProductSaaSLandingContent;
+      const content = landingContent as ProductSaaSLandingContent
       return !(
         (!content.pricing && link.title === 'Pricing') ||
         (!content.features && link.title === 'Features') ||
         (!content.contact && link.title === 'Contact')
-      );
+      )
     }
     if (landingContent.pageType === 'youtube') {
-      const content = landingContent as YouTubeLandingContent;
+      const content = landingContent as YouTubeLandingContent
       // Assuming YouTube type might also have a contact section defined in its type
-      return !(!content.contact && link.title === 'Contact');
+      return !(!content.contact && link.title === 'Contact')
     }
-    return true; // Default: don't filter if pageType is unknown or doesn't match
-  });
+    return true // Default: don't filter if pageType is unknown or doesn't match
+  })
 
   const logoSrc =
     siteMetadata.logoUrl ||

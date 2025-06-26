@@ -14,7 +14,11 @@ import { HiCheckCircle } from 'react-icons/hi2'
 import { iconMap, getIconComponent } from '@/lib/utils/iconMap'
 import { useEmailSubscription } from '@/lib/useEmailSubscription'
 import { useState, useRef, useEffect } from 'react' // Keep for client components
-import { ProductSaaSLandingContent, CtaSection as CtaSectionType, ContactSection as ContactSectionType } from './allset/landing-content/types' // Ensure types are correctly imported
+import {
+  ProductSaaSLandingContent,
+  CtaSection as CtaSectionType,
+  ContactSection as ContactSectionType,
+} from './allset/landing-content/types' // Ensure types are correctly imported
 
 // const landingContent = dataLandingContent as ProductSaaSLandingContent // Removed
 
@@ -27,28 +31,31 @@ async function getLandingContentData(slug: string): Promise<ProductSaaSLandingCo
   try {
     // Assuming your app is served from the root, API routes are absolute paths.
     // If running locally, ensure NEXT_PUBLIC_APP_URL is set or adjust path.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
       cache: 'no-store', // Or configure revalidation as needed
-    });
+    })
     if (!res.ok) {
-      console.error(`Failed to fetch landing content for slug ${slug}: ${res.status} ${res.statusText}`)
-      return null;
+      console.error(
+        `Failed to fetch landing content for slug ${slug}: ${res.status} ${res.statusText}`
+      )
+      return null
     }
-    const data = await res.json();
+    const data = await res.json()
     // Add validation here if necessary to ensure data matches ProductSaaSLandingContent
     if (data.pageType !== 'product' && data.pageType !== 'saas') {
-        console.warn(`Fetched content for slug ${slug} is not of type product/saas. PageType: ${data.pageType}`);
-        // Decide how to handle this - return null, or a default, or throw error
-        // For now, returning as is, but type casting below might be an issue.
+      console.warn(
+        `Fetched content for slug ${slug} is not of type product/saas. PageType: ${data.pageType}`
+      )
+      // Decide how to handle this - return null, or a default, or throw error
+      // For now, returning as is, but type casting below might be an issue.
     }
-    return data as ProductSaaSLandingContent;
+    return data as ProductSaaSLandingContent
   } catch (error) {
-    console.error(`Error fetching landing content for slug ${slug}:`, error);
-    return null;
+    console.error(`Error fetching landing content for slug ${slug}:`, error)
+    return null
   }
 }
-
 
 // ContactSection remains a Client Component due to hooks
 const ContactSectionClient = ({ contact }: { contact: ContactSectionType }) => {
@@ -153,7 +160,9 @@ const HeroSection = ({ hero }) => (
   <div className="flex flex-col-reverse items-center justify-between py-16 md:py-24 lg:flex-row">
     <div className="space-y-6 lg:w-1/2">
       <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
-        {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
+        {hero.title?.split(' ')[0] && (
+          <span className="text-primary-500">{hero.title.split(' ')[0]}</span>
+        )}{' '}
         <span className="text-slate-900 dark:text-white">
           {hero.title?.split(' ').slice(1).join(' ')}
         </span>
@@ -179,7 +188,7 @@ const HeroSection = ({ hero }) => (
         <div className="w-full overflow-hidden rounded-lg shadow-xl">
           <Image
             src={hero.image || landingDemoImage} // Fallback to demo image
-            alt={hero.title || "AI Landing Page Generator Demo"}
+            alt={hero.title || 'AI Landing Page Generator Demo'}
             width={1024}
             height={576}
             className="h-auto w-full"
@@ -195,7 +204,9 @@ const HeroSection = ({ hero }) => (
 // MainFeaturesSection is presentational
 const MainFeaturesSection = ({ mainFeatures }) => (
   <div className="py-16">
-    <h2 className="mb-12 text-center text-3xl font-bold">{mainFeatures.title || "Main Features"}</h2>
+    <h2 className="mb-12 text-center text-3xl font-bold">
+      {mainFeatures.title || 'Main Features'}
+    </h2>
     <div className="grid gap-8 md:grid-cols-3">
       {mainFeatures.items.map((feature) => (
         <div
@@ -213,7 +224,9 @@ const MainFeaturesSection = ({ mainFeatures }) => (
 // FeaturesGridSection is presentational
 const FeaturesGridSection = ({ features }) => (
   <div className="py-16">
-    <h2 className="mb-12 text-center text-3xl font-bold">{features.title || "Everything You Need to Launch Fast"}</h2>
+    <h2 className="mb-12 text-center text-3xl font-bold">
+      {features.title || 'Everything You Need to Launch Fast'}
+    </h2>
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
       {features.items.map((feature) => (
         <div
@@ -322,7 +335,6 @@ const CtaSectionClient = ({ cta }: { cta: CtaSectionType }) => {
   )
 }
 
-
 // BlogPostsSection is presentational
 const BlogPostsSection = ({ posts }) => (
   <div className="py-16">
@@ -386,13 +398,15 @@ export default async function Home() {
     // You might want to render a fallback UI or throw an error
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
-        <p className="text-lg text-red-500">Failed to load landing page content. Please try again later.</p>
+        <p className="text-lg text-red-500">
+          Failed to load landing page content. Please try again later.
+        </p>
       </div>
     )
   }
 
   // Destructure content safely, providing fallbacks if a section might be optional
-  const { hero, mainFeatures, features, cta, pricing, contact } = landingContent;
+  const { hero, mainFeatures, features, cta, pricing, contact } = landingContent
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-10/12 xl:px-0">
@@ -401,8 +415,10 @@ export default async function Home() {
       {features && <FeaturesGridSection features={features} />}
       {pricing && <PricingSection pricing={pricing} />}
       {cta && <CtaSectionClient cta={cta} />} {/* Use the client component wrapper */}
-      <BlogPostsSection posts={posts} /> {/* Blog posts are from Contentlayer, not dynamic content */}
-      {contact && <ContactSectionClient contact={contact} />} {/* Use the client component wrapper */}
+      <BlogPostsSection posts={posts} />{' '}
+      {/* Blog posts are from Contentlayer, not dynamic content */}
+      {contact && <ContactSectionClient contact={contact} />}{' '}
+      {/* Use the client component wrapper */}
     </div>
   )
 }

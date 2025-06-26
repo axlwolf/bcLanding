@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { llmService } from '@/lib/llm'
-import { LandingContent } from '@/lib/llm/types' // Assuming this type is compatible with section structures
+import { LandingContent } from '../../../allset/landing-content/types' // Corrected relative path
 import siteMetadata from '@/data/siteMetadata'
 import { generateImagesForLandingContent } from '@/lib/llm/generateLandingImages'
 import { supabase } from '@/lib/supabaseClient'
@@ -9,6 +9,15 @@ export const dynamic = 'force-dynamic' // Allow dynamic operations
 export const revalidate = 0
 
 const DEFAULT_LANDING_PAGE_SLUG = 'main-landing'
+
+// Define an interface for the objects being pushed into sectionsToUpsert
+interface PageContentSectionUpsert {
+  page_id: string | number // pageData.id could be string or number depending on Supabase schema
+  section_slug: string
+  content: any // content can be any JSON structure
+  display_order: number
+  is_active: boolean
+}
 
 async function saveGeneratedContentToSupabase(slug: string, generatedContent: LandingContent) {
   console.log(`Saving generated content to Supabase for slug: ${slug}`)
@@ -21,7 +30,8 @@ async function saveGeneratedContentToSupabase(slug: string, generatedContent: La
     .single()
 
   if (pageFetchError) {
-    if (pageFetchError.code === 'PGRST116') { // Not found
+    if (pageFetchError.code === 'PGRST116') {
+      // Not found
       // Optionally, create the page if it doesn't exist, or throw an error.
       // For now, let's assume it should exist if we're generating content for it.
       console.error(`Landing page with slug '${slug}' not found. Cannot save generated content.`)
@@ -49,7 +59,7 @@ async function saveGeneratedContentToSupabase(slug: string, generatedContent: La
   }
 
   // 3. Upsert sections into page_content
-  const sectionsToUpsert = []
+  const sectionsToUpsert: PageContentSectionUpsert[] = []
   let displayOrder = 0
   for (const sectionSlug in generatedContent) {
     if (sectionSlug === 'pageType') {
@@ -67,29 +77,31 @@ async function saveGeneratedContentToSupabase(slug: string, generatedContent: La
   }
 
   if (sectionsToUpsert.length > 0) {
-      const { error: upsertError } = await supabase
-          .from('page_content')
-          .upsert(sectionsToUpsert, {
-              onConflict: 'page_id,section_slug',
-          })
+    const { error: upsertError } = await supabase.from('page_content').upsert(sectionsToUpsert, {
+      onConflict: 'page_id,section_slug',
+    })
 
-      if (upsertError) {
-          console.error(`Error upserting generated page content for pageId ${pageId}:`, upsertError)
-          throw upsertError
-      }
-      console.log(`Successfully upserted ${sectionsToUpsert.length} generated sections for pageId ${pageId}.`)
+    if (upsertError) {
+      console.error(`Error upserting generated page content for pageId ${pageId}:`, upsertError)
+      throw upsertError
+    }
+    console.log(
+      `Successfully upserted ${sectionsToUpsert.length} generated sections for pageId ${pageId}.`
+    )
   }
 
   // Update landing_page's updated_at timestamp
   const { error: updatePageTimestampError } = await supabase
     .from('landing_pages')
     .update({ updated_at: new Date().toISOString() })
-    .eq('id', pageId);
+    .eq('id', pageId)
   if (updatePageTimestampError) {
-    console.warn(`Could not update landing_pages.updated_at for pageId ${pageId} after generation:`, updatePageTimestampError);
+    console.warn(
+      `Could not update landing_pages.updated_at for pageId ${pageId} after generation:`,
+      updatePageTimestampError
+    )
   }
 }
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -111,9 +123,15 @@ export async function POST(request: NextRequest) {
     }
 
     const contentLanguage = siteMetadata.language
-    console.log(`API: Generating landing content in site language: ${contentLanguage} for page type: ${requestedPageType || 'any (AI determined)'}`)
+    console.log(
+      `API: Generating landing content in site language: ${contentLanguage} for page type: ${requestedPageType || 'any (AI determined)'}`
+    )
 
-    const result = await llmService.generateLandingContent(description, contentLanguage, requestedPageType)
+    const result = await llmService.generateLandingContent(
+      description,
+      contentLanguage,
+      requestedPageType
+    )
 
     if (result.error) {
       return NextResponse.json({ success: false, message: result.error }, { status: 500 })

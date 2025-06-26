@@ -28,32 +28,37 @@ import { HiCheckCircle } from 'react-icons/hi2'
 // Helper function to fetch landing content
 async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
       cache: 'no-store',
-    });
+    })
     if (!res.ok) {
-      console.error(`Failed to fetch landing content (Main3) for slug ${slug}: ${res.status} ${res.statusText}`)
-      return null;
+      console.error(
+        `Failed to fetch landing content (Main3) for slug ${slug}: ${res.status} ${res.statusText}`
+      )
+      return null
     }
-    const data = await res.json();
-     if (data.pageType !== 'product' && data.pageType !== 'saas') {
-        console.warn(`Fetched content for Main3 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`);
+    const data = await res.json()
+    if (data.pageType !== 'product' && data.pageType !== 'saas') {
+      console.warn(
+        `Fetched content for Main3 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`
+      )
     }
-    return data as ProductSaaSLandingContent;
+    return data as ProductSaaSLandingContent
   } catch (error) {
-    console.error(`Error fetching landing content (Main3) for slug ${slug}:`, error);
-    return null;
+    console.error(`Error fetching landing content (Main3) for slug ${slug}:`, error)
+    return null
   }
 }
-
 
 const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 pt-20 pb-16 text-center sm:px-6 lg:px-8 lg:pt-32">
         <h1 className="font-display mx-auto max-w-4xl text-5xl font-medium tracking-tight sm:text-7xl">
-          {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
+          {hero.title?.split(' ')[0] && (
+            <span className="text-primary-500">{hero.title.split(' ')[0]}</span>
+          )}{' '}
           <span className="text-slate-900 dark:text-white">
             {hero.title?.split(' ').slice(1).join(' ')}
           </span>
@@ -84,20 +89,25 @@ const imageMap = {
   landingDemoImage: landingDemoImage.src, // Use .src for Image component if it's a StaticImageData
   dashboardDemoImage: dashboardDemoImage.src,
   // Ensure that selectedFeature.image strings match keys in imageMap or are direct URLs
-};
+}
 
 // FeaturesSectionClient - Client Component for interactivity
 const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSectionType }) => {
   'use client'
-  const [selectedFeature, setSelectedFeature] = useState<MainFeature | undefined>(mainFeatures?.items?.[0]);
+  const [selectedFeature, setSelectedFeature] = useState<MainFeature | undefined>(
+    mainFeatures?.items?.[0]
+  )
 
   useEffect(() => {
-    if (mainFeatures?.items?.length > 0 && !mainFeatures.items.find(item => item.id === selectedFeature?.id)) {
-      setSelectedFeature(mainFeatures.items[0]);
+    if (
+      mainFeatures?.items?.length > 0 &&
+      !mainFeatures.items.find((item) => item.id === selectedFeature?.id)
+    ) {
+      setSelectedFeature(mainFeatures.items[0])
     }
-  }, [mainFeatures, selectedFeature]);
+  }, [mainFeatures, selectedFeature])
 
-  if (!mainFeatures?.items?.length) return null;
+  if (!mainFeatures?.items?.length) return null
 
   return (
     <section
@@ -302,7 +312,11 @@ const CallToActionSectionClient = ({ cta }: { cta: CtaSectionType }) => {
   )
 }
 
-const TestimonialsSection = ({ testimonials }: { testimonials: TestimonialSectionType | undefined }) => {
+const TestimonialsSection = ({
+  testimonials,
+}: {
+  testimonials: TestimonialSectionType | undefined
+}) => {
   if (!testimonials?.testimonials?.length) return null
 
   return (
@@ -342,7 +356,7 @@ const TestimonialsSection = ({ testimonials }: { testimonials: TestimonialSectio
                       </div>
                       <div className="overflow-hidden rounded-full bg-slate-50 dark:bg-gray-800">
                         <Image
-                          alt={testimonial.name || ""}
+                          alt={testimonial.name || ''}
                           loading="lazy"
                           width="56"
                           height="56"
@@ -454,15 +468,20 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType | undefined }
               <ul
                 className={`order-last mt-10 flex flex-col gap-y-3 text-sm ${plan.highlighted ? 'text-slate-100' : 'text-slate-200'}`}
               >
-                {plan.features.map((feature, idx) => ( // Changed key to idx from feature.text
-                  <li key={idx} className="flex">
-                    <HiCheckCircle
-                      className={`h-5 w-5 flex-none ${plan.highlighted ? 'text-slate-100' : 'text-slate-400'}`}
-                      aria-hidden="true"
-                    />
-                    <span className="ml-4">{feature.text}</span>
-                  </li>
-                ))}
+                {plan.features.map(
+                  (
+                    feature,
+                    idx // Changed key to idx from feature.text
+                  ) => (
+                    <li key={idx} className="flex">
+                      <HiCheckCircle
+                        className={`h-5 w-5 flex-none ${plan.highlighted ? 'text-slate-100' : 'text-slate-400'}`}
+                        aria-hidden="true"
+                      />
+                      <span className="ml-4">{feature.text}</span>
+                    </li>
+                  )
+                )}
               </ul>
               <Link
                 className={`group text-md mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 ring-1 ring-slate-700 hover:ring-slate-500 focus:outline-hidden focus-visible:outline-white active:text-slate-400 active:ring-slate-700 ${plan.highlighted ? 'bg-slate-100 text-slate-600' : 'bg-primary-600 text-slate-100'}`}
@@ -489,12 +508,15 @@ export default async function Main3() {
   if (!landingContent) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
-        <p className="text-lg text-red-500">Failed to load content for Main3 page. Please try again later.</p>
+        <p className="text-lg text-red-500">
+          Failed to load content for Main3 page. Please try again later.
+        </p>
       </div>
     )
   }
 
-  const { hero, mainFeatures, features, cta, gallery, testimonials, pricing, faqs, contact } = landingContent;
+  const { hero, mainFeatures, features, cta, gallery, testimonials, pricing, faqs, contact } =
+    landingContent
 
   return (
     <div>
@@ -503,9 +525,7 @@ export default async function Main3() {
         {mainFeatures?.items?.length > 0 && <FeaturesSectionClient mainFeatures={mainFeatures} />}
         {features?.items?.length > 0 && <SecondaryFeaturesSection features={features} />}
         {cta && <CallToActionSectionClient cta={cta} />}
-        {gallery && (
-          <ImportedGallerySection gallery={gallery} variant="dark" />
-        )}
+        {gallery && <ImportedGallerySection gallery={gallery} variant="dark" />}
         {testimonials && <TestimonialsSection testimonials={testimonials} />}
         {pricing && <PricingSection pricing={pricing} />}
         {faqs?.questions?.length > 0 && <FaqSection faqs={faqs} />}
