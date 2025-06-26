@@ -18,8 +18,8 @@ import { ProductSaaSLandingContent } from './allset/landing-content/types'
 // Helper function to fetch landing content
 async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+    // Changed to relative path for server-side fetching within the same app
+    const res = await fetch(`/api/allset/landing-content?slug=${slug}`, {
       cache: 'no-store', // Or configure revalidation as needed
     })
     if (!res.ok) {

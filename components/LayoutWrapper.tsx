@@ -19,8 +19,8 @@ const inter = Inter({
 // (Similar to the one in Main.tsx, etc., but might fetch a specific 'header' slug or default)
 async function getHeaderLandingContent(slug: string): Promise<LandingContent | null> {
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+    // Changed to relative path for server-side fetching within the same app
+    const res = await fetch(`/api/allset/landing-content?slug=${slug}`, {
       cache: 'no-store', // Or 'force-cache' with revalidate if appropriate for header
     })
     if (!res.ok) {

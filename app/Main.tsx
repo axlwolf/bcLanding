@@ -29,10 +29,8 @@ import { ContactFormData, useContactSubmission } from '@/lib/useContactSubmissio
 // For simplicity here, it's a local async function. In a real app, this might be in a 'lib' or 'services' folder.
 async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
   try {
-    // Assuming your app is served from the root, API routes are absolute paths.
-    // If running locally, ensure NEXT_PUBLIC_APP_URL is set or adjust path.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+    // Changed to relative path for server-side fetching within the same app
+    const res = await fetch(`/api/allset/landing-content?slug=${slug}`, {
       cache: 'no-store', // Or configure revalidation as needed
     })
     if (!res.ok) {
