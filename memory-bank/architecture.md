@@ -250,20 +250,20 @@ const finalTemplate = localTemplate || serverTemplate // Client override
 
 ### 1. Landing Page Generation (AI-powered)
 
-- **Location**: `app/api/allset/`, templates/
-- Dynamic, JSON-driven page structure (sections, CTAs, pricing, testimonials, FAQ, etc.)
-- Modular content blocks: easily rearranged, extended, or generated via AI
-- Animations and micro-interactions powered by GSAP, respecting accessibility
-- Multi-language and theme support
-- **Templates**: Main.tsx, Main2-6.tsx with different layouts
+- **Location**: `app/api/allset/landing-content`, `app/Main*.tsx` (page templates).
+- **Data Source**: Dynamic content (sections, CTAs, pricing, etc.) is fetched from Supabase (`landing_pages` and `page_content` tables) via the `/api/allset/landing-content` API.
+- Modular content blocks: easily rearranged, extended, or generated via AI (content saved to Supabase).
+- Animations and micro-interactions powered by GSAP, respecting accessibility.
+- Multi-language and theme support.
+- **Templates**: `Main.tsx`, `Main2-6.tsx` (and others) are async Server Components that fetch their respective content.
 
 ### 2. Blog Post Generation (AI-powered)
 
-- **Location**: `data/blog/`, lib/llm/
-- Automated, SEO-optimized content creation
-- Modular blog structure (title, tags, content, images, CTAs)
-- AI-assisted content review, structure, and optimization
-- **Content Management**: Contentlayer/MDX integration
+- **Location**: `data/blog/` (for Contentlayer), `lib/llm/` (for AI).
+- Automated, SEO-optimized content creation.
+- Modular blog structure (title, tags, content, images, CTAs).
+- AI-assisted content review, structure, and optimization.
+- **Content Management**: Contentlayer/MDX integration for blog posts. Landing page content is managed via Supabase.
 
 ### 3. Lead Reception & Analytics
 
@@ -312,9 +312,9 @@ const finalTemplate = localTemplate || serverTemplate // Client override
 ### Content Management
 
 - **Blog System**: Contentlayer/MDX for content processing
-- **Static Content**: JSON-driven configuration
-- **Internationalization**: Bilingual ES/EN support
-- **Media**: Next.js Image optimization
+- **Static Content**: General site configuration might still use local JSON or be in `site_settings` in Supabase. Dynamic landing page content is fully in Supabase.
+- **Internationalization**: Bilingual ES/EN support.
+- **Media**: Next.js Image optimization.
 
 ### Development & Testing
 
@@ -374,9 +374,9 @@ bcLanding/
 │   ├── email/            # Email utilities
 │   └── providers/        # External service providers
 ├── data/                  # Static content and config
-│   ├── config/           # Site configuration
-│   ├── blog/             # Blog content
-│   └── landingContent.json # Page content
+│   ├── config/           # Site configuration (e.g., siteMetadata.ts, or could be in Supabase)
+│   ├── blog/             # Blog content (Contentlayer/MDX)
+│   └── DEPRECATED_landingContent.json # Old landing page content, now in Supabase
 ├── memory-bank/           # Project documentation
 │   ├── ripperFive-Universal.mdc # Development protocol
 │   ├── architecture.md   # This file

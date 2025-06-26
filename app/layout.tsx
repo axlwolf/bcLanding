@@ -9,12 +9,7 @@ import { Analytics as VercelAnalytics } from '@vercel/analytics/next'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import { createClient } from '@supabase/supabase-js'
-
-// Initialize Supabase client for server-side fetching
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { LandingContent } from './allset/landing-content/types' // Import LandingContent type
 import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { DarkThemeProvider } from './theme-providers'
@@ -28,6 +23,50 @@ const space_grotesk = Space_Grotesk({
   display: 'swap',
   variable: '--font-space-grotesk',
 })
+
+// Supabase client for server-side fetching in RootLayout
+const supabaseServerClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+async function getLandingContentForHeader(slug: string): Promise<LandingContent | null> {
+  try {
+    const { data: pageData, error: pageError } = await supabaseServerClient
+      .from('landing_pages')
+      .select('id, page_type')
+      .eq('slug', slug)
+      .single()
+
+    if (pageError) {
+      console.error(`Header: Error fetching landing page for slug ${slug}:`, pageError.message)
+      return null
+    }
+
+    const { data: sectionsData, error: sectionsError } = await supabaseServerClient
+      .from('page_content')
+      .select('section_slug, content')
+      .eq('page_id', pageData.id)
+      .order('display_order', { ascending: true })
+
+    if (sectionsError) {
+      console.error(`Header: Error fetching page content for page_id ${pageData.id}:`, sectionsError.message)
+      return null
+    }
+
+    const reconstructedContent: { [key: string]: any } = {
+      pageType: pageData.page_type,
+    }
+    sectionsData.forEach((section) => {
+      reconstructedContent[section.section_slug] = section.content
+    })
+    return reconstructedContent as LandingContent
+  } catch (error) {
+    console.error(`Header: Unexpected error fetching landing content for slug ${slug}:`, error)
+    return null
+  }
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
@@ -69,24 +108,25 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Fetch dynamic settings from Supabase
-  const { data: dynamicSettings } = await supabase
+  // Fetch dynamic settings from Supabase for site metadata
+  const { data: dynamicSettings } = await supabaseServerClient
     .from('site_settings')
     .select('site_name, logo_url')
-    .eq('id', 1)
+    .eq('id', 1) // Assuming 'id' 1 is the global settings row
     .single()
 
-  // Merge static metadata with dynamic settings
   const finalSiteMetadata = {
     ...siteMetadata,
     title: dynamicSettings?.site_name || siteMetadata.title,
     headerTitle: dynamicSettings?.site_name || siteMetadata.headerTitle,
-    logoUrl: dynamicSettings?.logo_url || siteMetadata.siteLogo,
-    stickyNav: siteMetadata.stickyNav, // Explicitly include for type safety
+    logoUrl: dynamicSettings?.logo_url || siteMetadata.siteLogo, // Use logo_url from DB
+    stickyNav: siteMetadata.stickyNav,
   }
-  const basePath = process.env.BASE_PATH || ''
 
-  // Load theme settings during server rendering
+  // Fetch landing content for the header, using a default slug
+  const headerLandingContent = await getLandingContentForHeader('main-landing')
+
+  const basePath = process.env.BASE_PATH || ''
   const themeSettings = await getThemeSettings()
   const initialColor = themeSettings.primaryColor
 
@@ -125,7 +165,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <VercelAnalytics />
                   <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
                   <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-                    <Header siteMetadata={finalSiteMetadata} />
+                    {/* Pass fetched landingContent to Header */}
+                    <Header siteMetadata={finalSiteMetadata} landingContent={headerLandingContent} />
                     <main className="mb-auto">{children}</main>
                   </SearchProvider>
                   <Footer />

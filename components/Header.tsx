@@ -7,10 +7,10 @@ import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 import Image from 'next/image'
-import dataLandingContent from '@/data/landingContent.json'
-import { LandingContent } from 'app/allset/landing-content/types'
+// import dataLandingContent from '@/data/landingContent.json' // Removed
+import { LandingContent, ProductSaaSLandingContent, YouTubeLandingContent } from 'app/allset/landing-content/types' // Ensure all necessary types are imported
 
-const landingContent = dataLandingContent as LandingContent
+// const landingContent = dataLandingContent as LandingContent // Removed
 
 interface HeaderProps {
   siteMetadata: {
@@ -19,30 +19,37 @@ interface HeaderProps {
     siteLogo: string
     stickyNav: boolean
   }
+  landingContent: LandingContent | null // Added prop to receive landing content
 }
 
-const Header = ({ siteMetadata }: HeaderProps) => {
+const Header = ({ siteMetadata, landingContent }: HeaderProps) => {
   let headerClass =
     'flex items-center w-full bg-slate-100 dark:bg-slate-900 dark:text-slate-200 justify-between py-10 mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-10/12 xl:px-0'
   if (siteMetadata.stickyNav) {
     headerClass += ' sticky top-0 z-50'
   }
-  // If the pricing section is NOT in the landing content, remove it from the header
+
+  // Filter navLinks based on the passed landingContent
   const navLinks = headerNavLinks.filter((link) => {
+    if (!landingContent) { // If no content, show all links or a default set
+      return true; // Or apply some default filtering logic
+    }
     if (landingContent.pageType === 'product' || landingContent.pageType === 'saas') {
+      const content = landingContent as ProductSaaSLandingContent;
       return !(
-        (!('pricing' in landingContent && landingContent.pricing) && link.title === 'Pricing') ||
-        (!('features' in landingContent && landingContent.features) && link.title === 'Features') ||
-        (!landingContent.contact && link.title === 'Contact')
-      )
+        (!content.pricing && link.title === 'Pricing') ||
+        (!content.features && link.title === 'Features') ||
+        (!content.contact && link.title === 'Contact')
+      );
     }
     if (landingContent.pageType === 'youtube') {
-      return !(!landingContent.contact && link.title === 'Contact')
+      const content = landingContent as YouTubeLandingContent;
+      // Assuming YouTube type might also have a contact section defined in its type
+      return !(!content.contact && link.title === 'Contact');
     }
-    // Default: don't filter anything out
-    return true
-  })
-  // Use logo from siteMetadata (always string)
+    return true; // Default: don't filter if pageType is unknown or doesn't match
+  });
+
   const logoSrc =
     siteMetadata.logoUrl ||
     siteMetadata.siteLogo ||

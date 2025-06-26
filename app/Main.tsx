@@ -1,4 +1,5 @@
-'use client'
+// Remove 'use client' if Home becomes a Server Component primarily
+// 'use client' // Keep if significant client-side logic remains in Home, or move interactive parts to sub-components
 
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
@@ -6,20 +7,52 @@ import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
 import Image from 'next/image'
 import landingDemoImage from '../public/static/images/landing-demo.jpeg'
-import dataLandingContent from '@/data/landingContent.json'
+// import dataLandingContent from '@/data/landingContent.json' // Removed
 import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer'
 import { allBlogs } from 'contentlayer/generated'
 import { HiCheckCircle } from 'react-icons/hi2'
 import { iconMap, getIconComponent } from '@/lib/utils/iconMap'
 import { useEmailSubscription } from '@/lib/useEmailSubscription'
-import { useState, useRef, useEffect } from 'react'
-import { ProductSaaSLandingContent } from './allset/landing-content/types'
+import { useState, useRef, useEffect } from 'react' // Keep for client components
+import { ProductSaaSLandingContent, CtaSection as CtaSectionType, ContactSection as ContactSectionType } from './allset/landing-content/types' // Ensure types are correctly imported
 
-const landingContent = dataLandingContent as ProductSaaSLandingContent
+// const landingContent = dataLandingContent as ProductSaaSLandingContent // Removed
 
 import { ContactFormData, useContactSubmission } from '@/lib/useContactSubmission'
 
-const ContactSection = ({ contact }) => {
+// Helper function to fetch landing content
+// This should be defined in a way that it can be called from a Server Component.
+// For simplicity here, it's a local async function. In a real app, this might be in a 'lib' or 'services' folder.
+async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
+  try {
+    // Assuming your app is served from the root, API routes are absolute paths.
+    // If running locally, ensure NEXT_PUBLIC_APP_URL is set or adjust path.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+      cache: 'no-store', // Or configure revalidation as needed
+    });
+    if (!res.ok) {
+      console.error(`Failed to fetch landing content for slug ${slug}: ${res.status} ${res.statusText}`)
+      return null;
+    }
+    const data = await res.json();
+    // Add validation here if necessary to ensure data matches ProductSaaSLandingContent
+    if (data.pageType !== 'product' && data.pageType !== 'saas') {
+        console.warn(`Fetched content for slug ${slug} is not of type product/saas. PageType: ${data.pageType}`);
+        // Decide how to handle this - return null, or a default, or throw error
+        // For now, returning as is, but type casting below might be an issue.
+    }
+    return data as ProductSaaSLandingContent;
+  } catch (error) {
+    console.error(`Error fetching landing content for slug ${slug}:`, error);
+    return null;
+  }
+}
+
+
+// ContactSection remains a Client Component due to hooks
+const ContactSectionClient = ({ contact }: { contact: ContactSectionType }) => {
+  'use client' // Explicitly mark as client component
   const {
     form,
     touched,
@@ -105,6 +138,7 @@ const ContactSection = ({ contact }) => {
 
 const MAX_DISPLAY = 3
 
+// FeatureIcon can be a server or client component, it's simple enough
 const FeatureIcon = ({ icon }) => {
   const IconComponent = getIconComponent(icon)
   if (!IconComponent) {
@@ -114,13 +148,14 @@ const FeatureIcon = ({ icon }) => {
   return <IconComponent className="text-primary-500 h-6 w-6" />
 }
 
+// HeroSection is presentational, can be a server component
 const HeroSection = ({ hero }) => (
   <div className="flex flex-col-reverse items-center justify-between py-16 md:py-24 lg:flex-row">
     <div className="space-y-6 lg:w-1/2">
       <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
-        <span className="text-primary-500">{hero.title.split(' ')[0]}</span>{' '}
+        {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
         <span className="text-slate-900 dark:text-white">
-          {hero.title.split(' ').slice(1).join(' ')}
+          {hero.title?.split(' ').slice(1).join(' ')}
         </span>
       </h1>
       <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">{hero.description}</p>
@@ -143,8 +178,8 @@ const HeroSection = ({ hero }) => (
       <div className="relative">
         <div className="w-full overflow-hidden rounded-lg shadow-xl">
           <Image
-            src={landingDemoImage}
-            alt="AI Landing Page Generator Demo"
+            src={hero.image || landingDemoImage} // Fallback to demo image
+            alt={hero.title || "AI Landing Page Generator Demo"}
             width={1024}
             height={576}
             className="h-auto w-full"
@@ -157,9 +192,10 @@ const HeroSection = ({ hero }) => (
   </div>
 )
 
+// MainFeaturesSection is presentational
 const MainFeaturesSection = ({ mainFeatures }) => (
   <div className="py-16">
-    <h2 className="mb-12 text-center text-3xl font-bold">Main Features</h2>
+    <h2 className="mb-12 text-center text-3xl font-bold">{mainFeatures.title || "Main Features"}</h2>
     <div className="grid gap-8 md:grid-cols-3">
       {mainFeatures.items.map((feature) => (
         <div
@@ -174,9 +210,10 @@ const MainFeaturesSection = ({ mainFeatures }) => (
   </div>
 )
 
+// FeaturesGridSection is presentational
 const FeaturesGridSection = ({ features }) => (
   <div className="py-16">
-    <h2 className="mb-12 text-center text-3xl font-bold">Everything You Need to Launch Fast</h2>
+    <h2 className="mb-12 text-center text-3xl font-bold">{features.title || "Everything You Need to Launch Fast"}</h2>
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
       {features.items.map((feature) => (
         <div
@@ -192,6 +229,7 @@ const FeaturesGridSection = ({ features }) => (
   </div>
 )
 
+// PricingSection is presentational
 const PricingSection = ({ pricing }) => (
   <div className="py-16">
     <div className="text-center">
@@ -227,9 +265,10 @@ const PricingSection = ({ pricing }) => (
   </div>
 )
 
-const CtaSection = ({ cta }) => {
+// CtaSection needs to be a Client Component because of useEmailSubscription hook
+const CtaSectionClient = ({ cta }: { cta: CtaSectionType }) => {
+  'use client' // Explicitly mark as client component
   const [email, setEmail] = useState('')
-
   const { subscribe, status, message } = useEmailSubscription()
 
   return (
@@ -243,7 +282,7 @@ const CtaSection = ({ cta }) => {
             onSubmit={async (e) => {
               e.preventDefault()
               await subscribe(email)
-              if (status === 'success') setEmail('')
+              // Removed: if (status === 'success') setEmail('') // This can cause issues if status updates slower
             }}
           >
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-center">
@@ -283,6 +322,8 @@ const CtaSection = ({ cta }) => {
   )
 }
 
+
+// BlogPostsSection is presentational
 const BlogPostsSection = ({ posts }) => (
   <div className="py-16">
     <h2 className="mb-12 text-center text-3xl font-bold">Latest Updates</h2>
@@ -331,20 +372,37 @@ const BlogPostsSection = ({ posts }) => (
   </div>
 )
 
-export default function Home() {
-  const sortedPosts = sortPosts(allBlogs)
-  const posts = allCoreContent(sortedPosts)
-  const { hero, mainFeatures, features, cta, pricing, contact } = landingContent
+// Home component becomes an async Server Component
+export default async function Home() {
+  const sortedPosts = sortPosts(allBlogs) // This is fine for server component
+  const posts = allCoreContent(sortedPosts) // This is fine
+
+  // Fetch landing content data. Defaulting to 'main-landing' slug.
+  // This slug might need to be dynamic based on the route or other factors in a multi-page setup.
+  const landingContent = await getLandingContentData('main-landing')
+
+  if (!landingContent) {
+    // Handle case where content couldn't be fetched
+    // You might want to render a fallback UI or throw an error
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
+        <p className="text-lg text-red-500">Failed to load landing page content. Please try again later.</p>
+      </div>
+    )
+  }
+
+  // Destructure content safely, providing fallbacks if a section might be optional
+  const { hero, mainFeatures, features, cta, pricing, contact } = landingContent;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-10/12 xl:px-0">
-      <HeroSection hero={hero} />
-      <MainFeaturesSection mainFeatures={mainFeatures} />
-      <FeaturesGridSection features={features} />
-      <PricingSection pricing={pricing} />
-      <CtaSection cta={cta} />
-      <BlogPostsSection posts={posts} />
-      {contact && <ContactSection contact={contact} />}
+      {hero && <HeroSection hero={hero} />}
+      {mainFeatures && <MainFeaturesSection mainFeatures={mainFeatures} />}
+      {features && <FeaturesGridSection features={features} />}
+      {pricing && <PricingSection pricing={pricing} />}
+      {cta && <CtaSectionClient cta={cta} />} {/* Use the client component wrapper */}
+      <BlogPostsSection posts={posts} /> {/* Blog posts are from Contentlayer, not dynamic content */}
+      {contact && <ContactSectionClient contact={contact} />} {/* Use the client component wrapper */}
     </div>
   )
 }

@@ -1,29 +1,73 @@
-'use client'
+// Removed 'use client' from top level for Main2 to be a Server Component
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react' // Keep useState, useEffect for client sub-components
 import { useEmailSubscription } from '@/lib/useEmailSubscription'
 import landingDemoImage from '../public/static/images/landing-demo.jpeg'
 import dashboardDemoImage from '../public/static/images/dashboard-demo.jpg'
 import Image from 'next/image'
-import dataLandingContent from '@/data/landingContent.json'
-import Link from 'next/link'
+// import dataLandingContent from '@/data/landingContent.json' // Removed
+import Link from 'next/link' // Changed from '@/components/Link' to 'next/link' if appropriate
 import { HiCheckCircle } from 'react-icons/hi2'
-import FeatureIcon from '@/components/FeatureIcon'
+import FeatureIcon from '@/components/FeatureIcon' // Assuming FeatureIcon is a simple component
 import {
   ProductSaaSLandingContent,
-  GalleryImage,
-  MainFeaturesSection,
+  GalleryImage as GalleryImageType, // Renamed to avoid conflict if GalleryImage component exists
+  MainFeaturesSection as MainFeaturesSectionType,
+  HeroSection as HeroSectionType,
+  FeaturesSection as FeaturesSectionType,
+  CtaSection as CtaSectionType,
+  PricingSection as PricingSectionType,
+  GallerySection as GallerySectionType,
+  FaqsSection as FaqsSectionType,
+  ContactSection as ContactSectionType,
 } from './allset/landing-content/types'
 
-const landingContent = dataLandingContent as ProductSaaSLandingContent
+// const landingContent = dataLandingContent as ProductSaaSLandingContent // Removed
+
+// Helper function to fetch landing content (similar to app/Main.tsx)
+async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) {
+      console.error(`Failed to fetch landing content (Main2) for slug ${slug}: ${res.status} ${res.statusText}`)
+      return null
+    }
+    const data = await res.json()
+    if (data.pageType !== 'product' && data.pageType !== 'saas') {
+        console.warn(`Fetched content for Main2 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`)
+    }
+    return data as ProductSaaSLandingContent
+  } catch (error) {
+    console.error(`Error fetching landing content (Main2) for slug ${slug}:`, error)
+    return null
+  }
+}
+
 
 const imageMap = {
   landingDemoImage: landingDemoImage,
   dashboardDemoImage: dashboardDemoImage,
+  // Add more images here if selectedFeature.image can reference other static imports
 }
 
-const FeaturesSection = ({ mainFeatures }: { mainFeatures: MainFeaturesSection }) => {
+// FeaturesSection needs to be a client component due to useState
+const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSectionType }) => {
+  'use client'
   const [selectedFeature, setSelectedFeature] = useState(mainFeatures.items[0])
+
+  // Effect to update selectedFeature if mainFeatures.items itself changes or on initial load
+  useEffect(() => {
+    if (mainFeatures?.items?.length > 0) {
+      setSelectedFeature(mainFeatures.items[0]);
+    }
+  }, [mainFeatures]);
+
+
+  if (!mainFeatures?.items?.length) return null;
+
 
   return (
     <section
@@ -33,40 +77,35 @@ const FeaturesSection = ({ mainFeatures }: { mainFeatures: MainFeaturesSection }
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-12 items-center gap-8 lg:gap-16 xl:gap-24">
-          {/* Features List */}
           <div
             className="relative z-10 col-span-4 space-y-6"
             role="tablist"
             aria-orientation="vertical"
           >
-            {mainFeatures.items.map((feature) => {
-              return (
-                <button
-                  key={feature.id}
-                  onClick={() => setSelectedFeature(feature)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      setSelectedFeature(feature)
-                    }
-                  }}
-                  className={`relative w-full rounded-2xl text-left transition-colors ${
-                    selectedFeature.id === feature.id ? 'bg-gray-800' : 'hover:bg-gray-800/30'
-                  }`}
-                >
-                  <div className="relative z-10 p-8">
-                    <FeatureIcon icon={feature.icon} />
-                    <h3 className="mt-6 text-lg font-semibold text-white">{feature.title}</h3>
-                    <p className="mt-2 text-sm text-gray-400">{feature.description}</p>
-                  </div>
-                </button>
-              )
-            })}
+            {mainFeatures.items.map((feature) => (
+              <button
+                key={feature.id}
+                onClick={() => setSelectedFeature(feature)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedFeature(feature)
+                  }
+                }}
+                className={`relative w-full rounded-2xl text-left transition-colors ${
+                  selectedFeature?.id === feature.id ? 'bg-gray-800' : 'hover:bg-gray-800/30'
+                }`}
+              >
+                <div className="relative z-10 p-8">
+                  <FeatureIcon icon={feature.icon} />
+                  <h3 className="mt-6 text-lg font-semibold text-white">{feature.title}</h3>
+                  <p className="mt-2 text-sm text-gray-400">{feature.description}</p>
+                </div>
+              </button>
+            ))}
           </div>
-
-          {/* Image Display */}
           <div className="relative col-span-8 aspect-[16/9]">
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
-              {imageMap[selectedFeature.image] && (
+              {selectedFeature?.image && imageMap[selectedFeature.image] && (
                 <Image
                   src={imageMap[selectedFeature.image]}
                   alt={selectedFeature.title}
@@ -85,16 +124,16 @@ const FeaturesSection = ({ mainFeatures }: { mainFeatures: MainFeaturesSection }
   )
 }
 
-const HeroSection = ({ hero }) => {
+const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
-              <span className="text-primary-500">{hero.title.split(' ')[0]}</span>{' '}
+              {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
               <span className="text-slate-900 dark:text-white">
-                {hero.title.split(' ').slice(1).join(' ')}
+                {hero.title?.split(' ').slice(1).join(' ')}
               </span>
             </h1>
             <p className="mt-6 text-lg text-slate-600 dark:text-slate-300">{hero.description}</p>
@@ -181,8 +220,8 @@ const HeroSection = ({ hero }) => {
                 <div className="relative">
                   <div className="w-full overflow-hidden rounded-lg shadow-xl">
                     <Image
-                      src={landingDemoImage}
-                      alt="AI Landing Page Generator Demo"
+                      src={hero.image || landingDemoImage} // Fallback for hero image
+                      alt={hero.title || "AI Landing Page Generator Demo"}
                       width={1024}
                       height={576}
                       className="h-auto w-full"
@@ -201,7 +240,7 @@ const HeroSection = ({ hero }) => {
   )
 }
 
-const SecondaryFeaturesSection = ({ features }) => {
+const SecondaryFeaturesSection = ({ features }: { features: FeaturesSectionType }) => {
   return (
     <section
       id="secondary-features"
@@ -233,7 +272,9 @@ const SecondaryFeaturesSection = ({ features }) => {
   )
 }
 
-const CTASection = ({ cta }) => {
+// CTASection needs to be a client component
+const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
+  'use client'
   const [email, setEmail] = useState('')
   const { subscribe, status, message } = useEmailSubscription()
 
@@ -289,7 +330,7 @@ const CTASection = ({ cta }) => {
                 onSubmit={async (e) => {
                   e.preventDefault()
                   await subscribe(email)
-                  if (status === 'success') setEmail('')
+                  // if (status === 'success') setEmail('') // Can cause issues
                 }}
               >
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-center">
@@ -333,7 +374,7 @@ const CTASection = ({ cta }) => {
   )
 }
 
-const PricingSection = ({ pricing }) => {
+const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
   return (
     <section id="pricing" aria-label="Pricing plans" className="py-20 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -397,7 +438,7 @@ const PricingSection = ({ pricing }) => {
                       ))}
                     </ul>
                   </div>
-                  <a
+                  <a // Changed to <a> as Link might not be needed if it's external or just #
                     className="bg-primary-500 relative mt-6 inline-flex justify-center overflow-hidden rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-cyan-600 active:text-white/80 active:before:bg-transparent"
                     href={plan.cta.link}
                   >
@@ -413,31 +454,30 @@ const PricingSection = ({ pricing }) => {
   )
 }
 
-const GallerySection = ({ gallery }) => {
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+// GallerySection needs to be a client component
+const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType }) => {
+  'use client'
+  const [selectedImage, setSelectedImage] = useState<GalleryImageType | null>(null)
 
-  const openModal = (image: GalleryImage) => {
+  const openModal = (image: GalleryImageType) => {
     setSelectedImage(image)
-    document.body.style.overflow = 'hidden' // Prevent scrolling when modal is open
+    document.body.style.overflow = 'hidden'
   }
 
   const closeModal = () => {
     setSelectedImage(null)
-    document.body.style.overflow = 'auto' // Re-enable scrolling
+    document.body.style.overflow = 'auto'
   }
 
-  // Close modal when Escape key is pressed
-  React.useEffect(() => {
-    const handleEscKey = (event) => {
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         closeModal()
       }
     }
-
     if (selectedImage) {
       window.addEventListener('keydown', handleEscKey)
     }
-
     return () => {
       window.removeEventListener('keydown', handleEscKey)
     }
@@ -494,8 +534,6 @@ const GallerySection = ({ gallery }) => {
         </div>
       </div>
 
-      {/* Image Modal */}
-      {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
       {selectedImage && (
         <dialog
           open
@@ -549,7 +587,7 @@ const GallerySection = ({ gallery }) => {
   )
 }
 
-const FaqSection = ({ faqs }) => {
+const FaqSection = ({ faqs }: { faqs: FaqsSectionType }) => {
   return (
     <section
       id="faqs"
@@ -565,9 +603,9 @@ const FaqSection = ({ faqs }) => {
             {faqs.title}
           </h2>
           <p className="mt-4 text-lg tracking-tight text-slate-700 dark:text-slate-200">
-            {faqs.description.split(' ').slice(0, -2).join(' ')}{' '}
+            {faqs.description?.split(' ').slice(0, -2).join(' ')}{' '}
             <span className="text-primary-500">
-              {faqs.description.split(' ').slice(-2).join(' ')}
+              {faqs.description?.split(' ').slice(-2).join(' ')}
             </span>
           </p>
         </div>
@@ -586,19 +624,32 @@ const FaqSection = ({ faqs }) => {
   )
 }
 
-import Main2ContactSection from './Main2ContactSection'
+import Main2ContactSection from './Main2ContactSection' // Assuming this is already a client component or can be
 
-const Main2 = () => {
-  const { hero, mainFeatures, features, cta, gallery, pricing, faqs, contact } = landingContent
+// Main2 becomes an async Server Component
+export default async function Main2() {
+  // Fetch landing content. Using "main-landing" for now, this could be specific like "main2-landing"
+  const landingContent = await getLandingContentData('main-landing');
+
+  if (!landingContent) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
+        <p className="text-lg text-red-500">Failed to load content for Main2 page. Please try again later.</p>
+      </div>
+    );
+  }
+
+  // Destructure content safely, providing fallbacks if a section might be optional
+  const { hero, mainFeatures, features, cta, gallery, pricing, faqs, contact } = landingContent;
 
   return (
     <>
       <main className="flex-auto">
         {hero && <HeroSection hero={hero} />}
-        {mainFeatures && <FeaturesSection mainFeatures={mainFeatures} />}
+        {mainFeatures && <FeaturesSectionClient mainFeatures={mainFeatures} />} {/* Use client version */}
         {features && <SecondaryFeaturesSection features={features} />}
-        {cta && <CTASection cta={cta} />}
-        {gallery && <GallerySection gallery={gallery} />}
+        {cta && <CTASectionClient cta={cta} />} {/* Use client version */}
+        {gallery && <GallerySectionClient gallery={gallery} />} {/* Use client version */}
         {pricing && <PricingSection pricing={pricing} />}
         {faqs && <FaqSection faqs={faqs} />}
         {contact && <Main2ContactSection contact={contact} />}
@@ -606,5 +657,3 @@ const Main2 = () => {
     </>
   )
 }
-
-export default Main2

@@ -13,6 +13,7 @@ BoothieCall is a premium landing page generator for photo booth rentals, built w
 - **GSAP Animations**: Premium micro-interactions and smooth transitions
 - **Bilingual Support**: Spanish/English content management
 - **Cloud-Native**: Full Supabase integration for scalable deployment
+- **Dynamic Landing Page Content**: Editable via admin panel, stored in Supabase.
 
 ---
 
@@ -31,6 +32,14 @@ BoothieCall is a premium landing page generator for photo booth rentals, built w
 - **Admin UX**: Template changes without leaving admin panel (`/allset/templates`).
 - **Cross-Tab Sync**: Changes propagate automatically between browser tabs.
 
+### ✅ Dynamic Landing Page Content Management (New - [Current Date])
+
+- **Supabase Backend**: All landing page textual and structural content (hero, features, CTAs, etc.) is now stored in Supabase (`landing_pages` and `page_content` tables).
+- **Dynamic Rendering**: Page templates (`Main*.tsx`) fetch content dynamically from Supabase.
+- **Content Editor Integration**: The admin editor at `/allset/landing-content` now reads from and writes to Supabase.
+- **Vercel Compatibility**: Eliminates reliance on local JSON files for page content, ensuring full Vercel deployment compatibility.
+- **AI Content Generation**: AI tools now also use and save content to Supabase.
+
 ---
 
 ## Quick Start
@@ -46,23 +55,27 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 1. **Clone & Install**: `npm install`
 2. **Environment**: Copy `.env.example` to `.env.local` and configure all required variables.
-3. **Database**: Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project. This will create the `site_config` table (for templates) and the `site_settings` table (for global settings).
+3. **Database**:
+    - Run the SQL setup scripts from `VERCEL_SETUP.md` in your Supabase project. This will create the `site_config` table (for templates) and the `site_settings` table (for global settings).
+    - Run the SQL DDL provided in the `memory-bank` (or commit history) to create the `landing_pages` and `page_content` tables for dynamic landing page content.
+    - After table creation, run `npm run db:migrate-landing-content` to populate these tables with initial content from the (now deleted) `data/landingContent.json`.
 4. **Storage**: In your Supabase project, create a new **public** storage bucket named `siteassets`. Then, run the storage policy script from `VERCEL_SETUP.md` to allow public uploads.
-5. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure the required tables exist.
+5. **Verify Supabase (Optional but Recommended)**: Run `npm run verify-supabase` to test your connection to the Supabase database and ensure all required tables exist (`site_config`, `site_settings`, `landing_pages`, `page_content`).
 6. **Start**: `npm run dev`
 
 ### Production Deployment
 
 1. **Vercel Setup**: See `VERCEL_SETUP.md` for complete deployment guide
-2. **Environment Variables**: Configure in Vercel Dashboard
-3. **Database**: Ensure Supabase `site_config` table exists
+2. **Environment Variables**: Configure in Vercel Dashboard (including `SUPABASE_SERVICE_KEY` if migration script needs to be run in a CI/CD pipeline, though typically it's a one-off local run).
+3. **Database**: Ensure Supabase `site_config`, `site_settings`, `landing_pages`, and `page_content` tables exist and are populated.
 
 ### Admin Panel
 
 1. **Template Management**: Navigate to `/allset/templates` to switch between site templates.
 2. **Site Settings**: Navigate to `/allset/settings` to update the site name, description, and logo.
-3. **Preview**: Use the "Preview Home" button in the template manager to verify changes.
-4. **Documentation**: See `memory-bank/` for complete technical details, including `lessons-learned.md`.
+3. **Landing Page Content**: Navigate to `/allset/landing-content` to edit the content of the main landing page.
+4. **Preview**: Use the "Preview Home" button in the template manager to verify changes.
+5. **Documentation**: See `memory-bank/` for complete technical details, including `lessons-learned.md`.
 
 ---
 

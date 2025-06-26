@@ -1,31 +1,61 @@
-'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react' // Keep for client components
 import landingDemoImage from '../public/static/images/landing-demo.jpeg'
 import dashboardDemoImage from '../public/static/images/dashboard-demo.jpg'
 import Image from 'next/image'
-import dataLandingContent from '@/data/landingContent.json'
-import type { ProductSaaSLandingContent } from './allset/landing-content/types' // adjust path if needed
+// import dataLandingContent from '@/data/landingContent.json' // Removed
+import type {
+  ProductSaaSLandingContent,
+  HeroSection as HeroSectionType,
+  MainFeaturesSection as MainFeaturesSectionType,
+  FeaturesSection as FeaturesSectionType,
+  CtaSection as CtaSectionType,
+  TestimonialSection as TestimonialSectionType,
+  FaqsSection as FaqsSectionType,
+  PricingSection as PricingSectionType,
+  GallerySection as GallerySectionType,
+  ContactSection as ContactSectionType,
+  MainFeature,
+} from './allset/landing-content/types'
 import Link from 'next/link'
-import GallerySection from '@/components/GallerySection'
+import ImportedGallerySection from '@/components/GallerySection' // Renamed to avoid conflict
 
 import { useEmailSubscription } from '@/lib/useEmailSubscription'
 import FeatureIcon from '@/components/FeatureIcon'
 import { HiCheckCircle } from 'react-icons/hi2'
 
-const landingContent = dataLandingContent as ProductSaaSLandingContent
+// const landingContent = dataLandingContent as ProductSaaSLandingContent // Removed
 
-const MAX_DISPLAY = 3
+// Helper function to fetch landing content
+async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      console.error(`Failed to fetch landing content (Main3) for slug ${slug}: ${res.status} ${res.statusText}`)
+      return null;
+    }
+    const data = await res.json();
+     if (data.pageType !== 'product' && data.pageType !== 'saas') {
+        console.warn(`Fetched content for Main3 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`);
+    }
+    return data as ProductSaaSLandingContent;
+  } catch (error) {
+    console.error(`Error fetching landing content (Main3) for slug ${slug}:`, error);
+    return null;
+  }
+}
 
-const HeroSection = () => {
-  const { hero } = landingContent
+
+const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 pt-20 pb-16 text-center sm:px-6 lg:px-8 lg:pt-32">
         <h1 className="font-display mx-auto max-w-4xl text-5xl font-medium tracking-tight sm:text-7xl">
-          <span className="text-primary-500">{hero.title.split(' ')[0]}</span>{' '}
+          {hero.title?.split(' ')[0] && <span className="text-primary-500">{hero.title.split(' ')[0]}</span>}{' '}
           <span className="text-slate-900 dark:text-white">
-            {hero.title.split(' ').slice(1).join(' ')}
+            {hero.title?.split(' ').slice(1).join(' ')}
           </span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700 sm:text-xl dark:text-slate-200">
@@ -51,12 +81,23 @@ const HeroSection = () => {
 }
 
 const imageMap = {
-  landingDemoImage: landingDemoImage,
-  dashboardDemoImage: dashboardDemoImage,
-}
+  landingDemoImage: landingDemoImage.src, // Use .src for Image component if it's a StaticImageData
+  dashboardDemoImage: dashboardDemoImage.src,
+  // Ensure that selectedFeature.image strings match keys in imageMap or are direct URLs
+};
 
-const FeaturesSection = () => {
-  const [selectedFeature, setSelectedFeature] = useState(landingContent.mainFeatures.items[0])
+// FeaturesSectionClient - Client Component for interactivity
+const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSectionType }) => {
+  'use client'
+  const [selectedFeature, setSelectedFeature] = useState<MainFeature | undefined>(mainFeatures?.items?.[0]);
+
+  useEffect(() => {
+    if (mainFeatures?.items?.length > 0 && !mainFeatures.items.find(item => item.id === selectedFeature?.id)) {
+      setSelectedFeature(mainFeatures.items[0]);
+    }
+  }, [mainFeatures, selectedFeature]);
+
+  if (!mainFeatures?.items?.length) return null;
 
   return (
     <section
@@ -72,56 +113,56 @@ const FeaturesSection = () => {
               role="tablist"
               aria-orientation="vertical"
             >
-              {landingContent.mainFeatures.items.map((feature) => {
-                return (
-                  <div
-                    key={feature.title}
-                    className={`group relative rounded-full px-4 py-1 lg:rounded-l-xl lg:rounded-r-none lg:p-6 ${
-                      selectedFeature.title === feature.title
-                        ? 'bg-primary-600 lg:bg-primary-600/10 lg:ring-primary-600/10 lg:ring-1 lg:ring-inset'
-                        : 'hover:bg-primary-600/10 lg:hover:bg-primary-600/5'
-                    }`}
-                  >
-                    <h3>
-                      <button
-                        className={`font-display text-lg focus:outline-none md:text-2xl ${
-                          selectedFeature.title === feature.title
-                            ? 'text-slate-100 lg:text-white'
-                            : 'text-slate-100 hover:text-white lg:text-white'
-                        }`}
-                        role="tab"
-                        aria-selected={selectedFeature.title === feature.title}
-                        tabIndex={selectedFeature.title === feature.title ? 0 : -1}
-                        onClick={() => setSelectedFeature(feature)}
-                      >
-                        <span className="absolute inset-0 rounded-full text-white lg:rounded-l-xl lg:rounded-r-none"></span>
-                        {feature.title}
-                      </button>
-                    </h3>
-                    <p
-                      className={`mt-2 hidden text-sm md:text-base lg:block ${selectedFeature.title === feature.title ? 'text-white' : 'text-white group-hover:text-white'}`}
+              {mainFeatures.items.map((feature) => (
+                <div
+                  key={feature.title}
+                  className={`group relative rounded-full px-4 py-1 lg:rounded-l-xl lg:rounded-r-none lg:p-6 ${
+                    selectedFeature?.title === feature.title
+                      ? 'bg-primary-600 lg:bg-primary-600/10 lg:ring-primary-600/10 lg:ring-1 lg:ring-inset'
+                      : 'hover:bg-primary-600/10 lg:hover:bg-primary-600/5'
+                  }`}
+                >
+                  <h3>
+                    <button
+                      className={`font-display text-lg focus:outline-none md:text-2xl ${
+                        selectedFeature?.title === feature.title
+                          ? 'text-slate-100 lg:text-white'
+                          : 'text-slate-100 hover:text-white lg:text-white'
+                      }`}
+                      role="tab"
+                      aria-selected={selectedFeature?.title === feature.title}
+                      tabIndex={selectedFeature?.title === feature.title ? 0 : -1}
+                      onClick={() => setSelectedFeature(feature)}
                     >
-                      {feature.description}
-                    </p>
-                  </div>
-                )
-              })}
+                      <span className="absolute inset-0 rounded-full text-white lg:rounded-l-xl lg:rounded-r-none"></span>
+                      {feature.title}
+                    </button>
+                  </h3>
+                  <p
+                    className={`mt-2 hidden text-sm md:text-base lg:block ${selectedFeature?.title === feature.title ? 'text-white' : 'text-white group-hover:text-white'}`}
+                  >
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
           <div className="lg:col-span-7">
             <div>
               <div className="mt-10 w-[45rem] overflow-hidden rounded-xl bg-slate-50 shadow-xl shadow-blue-900/20 sm:w-auto lg:mt-0 lg:w-[67.8125rem]">
-                <Image
-                  alt={selectedFeature.title}
-                  fetchPriority="high"
-                  width="2174"
-                  height="1464"
-                  decoding="async"
-                  className="w-full"
-                  style={{ color: 'transparent' }}
-                  sizes="(min-width: 1024px) 67.8125rem, (min-width: 640px) 100vw, 45rem"
-                  src={selectedFeature.image}
-                />
+                {selectedFeature?.image && (
+                  <Image
+                    alt={selectedFeature.title}
+                    fetchPriority="high"
+                    width="2174"
+                    height="1464"
+                    decoding="async"
+                    className="w-full"
+                    style={{ color: 'transparent' }}
+                    sizes="(min-width: 1024px) 67.8125rem, (min-width: 640px) 100vw, 45rem"
+                    src={imageMap[selectedFeature.image] || selectedFeature.image} // Fallback to direct URL if not in imageMap
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -131,10 +172,8 @@ const FeaturesSection = () => {
   )
 }
 
-const SecondaryFeaturesSection = () => {
-  const { features } = landingContent
-
-  if (!features || features.items.length === 0) return null
+const SecondaryFeaturesSection = ({ features }: { features: FeaturesSectionType }) => {
+  if (!features?.items?.length) return null
 
   return (
     <section
@@ -152,23 +191,21 @@ const SecondaryFeaturesSection = () => {
           </p>
         </div>
         <div className="-mx-4 mt-20 flex flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 lg:hidden">
-          {features.items.map((feature) => {
-            return (
-              <div key={feature.title}>
-                <div className="mx-auto max-w-2xl">
-                  <div className="w-9">
-                    <FeatureIcon icon={feature.icon} />
-                  </div>
-                  <h3 className="text-primary-600 dark:text-primary-200 mt-6 text-xl font-medium">
-                    {feature.title}
-                  </h3>
-                  <p className="font-display mt-2 text-lg text-slate-900 dark:text-slate-200">
-                    {feature.description}
-                  </p>
+          {features.items.map((feature) => (
+            <div key={feature.title}>
+              <div className="mx-auto max-w-2xl">
+                <div className="w-9">
+                  <FeatureIcon icon={feature.icon} />
                 </div>
+                <h3 className="text-primary-600 dark:text-primary-200 mt-6 text-xl font-medium">
+                  {feature.title}
+                </h3>
+                <p className="font-display mt-2 text-lg text-slate-900 dark:text-slate-200">
+                  {feature.description}
+                </p>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       </div>
       <div className="hidden lg:mt-20 lg:block">
@@ -177,33 +214,31 @@ const SecondaryFeaturesSection = () => {
           role="tablist"
           aria-orientation="horizontal"
         >
-          {features.items.map((feature) => {
-            return (
-              <div key={feature.title}>
-                <div className="relative my-6 opacity-90 hover:opacity-100">
-                  <div className="w-9">
-                    <FeatureIcon icon={feature.icon} />
-                  </div>
-                  <h3 className="text-primary-600 dark:text-primary-200 mt-3 text-xl font-medium">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-lg text-slate-900 dark:text-slate-200">
-                    {feature.description}
-                  </p>
+          {features.items.map((feature) => (
+            <div key={feature.title}>
+              <div className="relative my-6 opacity-90 hover:opacity-100">
+                <div className="w-9">
+                  <FeatureIcon icon={feature.icon} />
                 </div>
+                <h3 className="text-primary-600 dark:text-primary-200 mt-3 text-xl font-medium">
+                  {feature.title}
+                </h3>
+                <p className="mt-2 text-lg text-slate-900 dark:text-slate-200">
+                  {feature.description}
+                </p>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
 
-const CallToActionSection = () => {
-  const { cta } = landingContent
+// CallToActionSectionClient - Client Component
+const CallToActionSectionClient = ({ cta }: { cta: CtaSectionType }) => {
+  'use client'
   const [email, setEmail] = useState('')
-
   const { subscribe, status, message } = useEmailSubscription()
 
   return (
@@ -223,7 +258,7 @@ const CallToActionSection = () => {
                 onSubmit={async (e) => {
                   e.preventDefault()
                   await subscribe(email)
-                  if (status === 'success') setEmail('')
+                  // if (status === 'success') setEmail('') // Can cause issues
                 }}
               >
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-center">
@@ -267,9 +302,8 @@ const CallToActionSection = () => {
   )
 }
 
-const TestimonialsSection = () => {
-  const testimonials = landingContent.testimonials
-  if (!testimonials) return null
+const TestimonialsSection = ({ testimonials }: { testimonials: TestimonialSectionType | undefined }) => {
+  if (!testimonials?.testimonials?.length) return null
 
   return (
     <section
@@ -308,7 +342,7 @@ const TestimonialsSection = () => {
                       </div>
                       <div className="overflow-hidden rounded-full bg-slate-50 dark:bg-gray-800">
                         <Image
-                          alt=""
+                          alt={testimonial.name || ""}
                           loading="lazy"
                           width="56"
                           height="56"
@@ -331,11 +365,8 @@ const TestimonialsSection = () => {
   )
 }
 
-const FaqSection = () => {
-  const { faqs } = landingContent
-  const faqStyle = {
-    color: 'transparent',
-  }
+const FaqSection = ({ faqs }: { faqs: FaqsSectionType | undefined }) => {
+  if (!faqs?.questions?.length) return null
 
   return (
     <section
@@ -352,9 +383,9 @@ const FaqSection = () => {
             {faqs.title}
           </h2>
           <p className="mt-4 text-lg tracking-tight text-slate-700 dark:text-slate-200">
-            {faqs.description.split(' ').slice(0, -2).join(' ')}{' '}
+            {faqs.description?.split(' ').slice(0, -2).join(' ')}{' '}
             <span className="text-primary-500">
-              {faqs.description.split(' ').slice(-2).join(' ')}
+              {faqs.description?.split(' ').slice(-2).join(' ')}
             </span>
           </p>
         </div>
@@ -377,9 +408,8 @@ const FaqSection = () => {
   )
 }
 
-const PricingSection = () => {
-  const pricing = landingContent.pricing ?? null
-  if (!pricing) return null
+const PricingSection = ({ pricing }: { pricing: PricingSectionType | undefined }) => {
+  if (!pricing?.plans?.length) return null
 
   return (
     <section id="pricing" aria-label="Pricing" className="bg-slate-900 py-20 sm:py-32">
@@ -424,8 +454,8 @@ const PricingSection = () => {
               <ul
                 className={`order-last mt-10 flex flex-col gap-y-3 text-sm ${plan.highlighted ? 'text-slate-100' : 'text-slate-200'}`}
               >
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex">
+                {plan.features.map((feature, idx) => ( // Changed key to idx from feature.text
+                  <li key={idx} className="flex">
                     <HiCheckCircle
                       className={`h-5 w-5 flex-none ${plan.highlighted ? 'text-slate-100' : 'text-slate-400'}`}
                       aria-hidden="true"
@@ -436,7 +466,7 @@ const PricingSection = () => {
               </ul>
               <Link
                 className={`group text-md mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 ring-1 ring-slate-700 hover:ring-slate-500 focus:outline-hidden focus-visible:outline-white active:text-slate-400 active:ring-slate-700 ${plan.highlighted ? 'bg-slate-100 text-slate-600' : 'bg-primary-600 text-slate-100'}`}
-                color="white"
+                color="white" // This prop might not be valid for Link, check component definition
                 aria-label={`Get started with the ${plan.name} plan for ${plan.price}`}
                 href={plan.cta.link}
               >
@@ -450,26 +480,37 @@ const PricingSection = () => {
   )
 }
 
-import Main3ContactSection from './Main3ContactSection'
+import Main3ContactSection from './Main3ContactSection' // Assuming this is a client component
 
-const Main3 = () => {
+// Main3 becomes an async Server Component
+export default async function Main3() {
+  const landingContent = await getLandingContentData('main-landing') // Or a slug specific to Main3
+
+  if (!landingContent) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
+        <p className="text-lg text-red-500">Failed to load content for Main3 page. Please try again later.</p>
+      </div>
+    )
+  }
+
+  const { hero, mainFeatures, features, cta, gallery, testimonials, pricing, faqs, contact } = landingContent;
+
   return (
     <div>
       <main>
-        {landingContent.hero && <HeroSection />}
-        {landingContent.mainFeatures?.items?.length > 0 && <FeaturesSection />}
-        {landingContent.features?.items?.length > 0 && <SecondaryFeaturesSection />}
-        {landingContent.cta && <CallToActionSection />}
-        {landingContent.gallery && (
-          <GallerySection gallery={landingContent.gallery} variant="dark" />
+        {hero && <HeroSection hero={hero} />}
+        {mainFeatures?.items?.length > 0 && <FeaturesSectionClient mainFeatures={mainFeatures} />}
+        {features?.items?.length > 0 && <SecondaryFeaturesSection features={features} />}
+        {cta && <CallToActionSectionClient cta={cta} />}
+        {gallery && (
+          <ImportedGallerySection gallery={gallery} variant="dark" />
         )}
-        {landingContent.testimonials && <TestimonialsSection />}
-        {landingContent.pricing && <PricingSection />}
-        {landingContent.faqs?.questions?.length > 0 && <FaqSection />}
-        {landingContent.contact && <Main3ContactSection contact={landingContent.contact} />}
+        {testimonials && <TestimonialsSection testimonials={testimonials} />}
+        {pricing && <PricingSection pricing={pricing} />}
+        {faqs?.questions?.length > 0 && <FaqSection faqs={faqs} />}
+        {contact && <Main3ContactSection contact={contact} />}
       </main>
     </div>
   )
 }
-
-export default Main3
