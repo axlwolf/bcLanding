@@ -7,33 +7,35 @@ import Main3 from './Main3'
 import Main4 from './Main4'
 import Main5 from './Main5'
 import Main6 from './Main6'
+import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer' // For preparing posts
+import { allBlogs } from 'contentlayer/generated' // For preparing posts
 
-export const dynamic = 'force-dynamic' // Recommended for pages with dynamic data
-export const revalidate = 0 // No caching or revalidate as needed
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-export default async function HomePage() { // Renamed to HomePage for clarity
-  // Server-side: Get template from Supabase (always reliable)
+export default async function HomePage() {
   const config = await getSiteConfigFromSupabase()
-  // Default to 'Main' if activeTemplate is not found or is null/undefined
   const serverTemplate = config?.activeTemplate || 'Main'
 
   console.log('[SERVER] Rendering HomePage with serverTemplate from Supabase:', serverTemplate)
 
-  // These Main* components are now async Server Components.
-  // They fetch their own data. We are simply passing their rendered output (as ReactNode)
-  // to the ClientTemplateWrapper.
+  // Prepare posts data here in the Server Component
+  const sortedPosts = sortPosts(allBlogs)
+  const posts = allCoreContent(sortedPosts)
+
+  // Pass posts to each Main* component.
+  // Each Main* component will need to be updated to accept a 'posts' prop if it uses BlogPostsSection.
   const components = {
-    Main: <Main />,
-    Main2: <Main2 />,
-    Main3: <Main3 />,
-    Main4: <Main4 />,
-    Main5: <Main5 />,
-    Main6: <Main6 />,
+    Main: <Main posts={posts} />, // Pass posts
+    Main2: <Main2 posts={posts} />, // Pass posts (if Main2 uses BlogPostsSection)
+    Main3: <Main3 posts={posts} />, // etc.
+    Main4: <Main4 posts={posts} />,
+    Main5: <Main5 posts={posts} />,
+    Main6: <Main6 posts={posts} />, // Main6 is YouTube, might not use 'posts' in the same way
   }
 
-  const defaultComponent = <Main />; // Define a default component instance
+  const defaultComponent = <Main posts={posts} />;
 
-  // Pass server template and components map to client wrapper
   return (
     <ClientTemplateWrapper
       serverTemplate={serverTemplate}
