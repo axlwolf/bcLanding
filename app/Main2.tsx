@@ -1,17 +1,16 @@
-// Removed 'use client' from top level for Main2 to be a Server Component
+'use client' // Main2 is a Client Component
 
-import React, { useState, useEffect } from 'react' // Keep useState, useEffect for client sub-components
+import React, { useState, useEffect } from 'react'
 import { useEmailSubscription } from '@/lib/useEmailSubscription'
 import landingDemoImage from '../public/static/images/landing-demo.jpeg'
 import dashboardDemoImage from '../public/static/images/dashboard-demo.jpg'
 import Image from 'next/image'
-// import dataLandingContent from '@/data/landingContent.json' // Removed
-import Link from 'next/link' // Changed from '@/components/Link' to 'next/link' if appropriate
+import Link from 'next/link'
 import { HiCheckCircle } from 'react-icons/hi2'
-import FeatureIcon from '@/components/FeatureIcon' // Assuming FeatureIcon is a simple component
+import FeatureIcon from '@/components/FeatureIcon'
 import {
   ProductSaaSLandingContent,
-  GalleryImage as GalleryImageType, // Renamed to avoid conflict if GalleryImage component exists
+  GalleryImage as GalleryImageType,
   MainFeaturesSection as MainFeaturesSectionType,
   HeroSection as HeroSectionType,
   FeaturesSection as FeaturesSectionType,
@@ -21,23 +20,26 @@ import {
   FaqsSection as FaqsSectionType,
   ContactSection as ContactSectionType,
 } from './allset/landing-content/types'
+import Main2ContactSection from './Main2ContactSection' // Assuming this is already a client component or will be made one
 
-// const landingContent = dataLandingContent as ProductSaaSLandingContent // Removed
-
-// Helper function to fetch landing content (similar to app/Main.tsx)
-async function getLandingContentData(slug: string): Promise<ProductSaaSLandingContent | null> {
+// Helper function to fetch landing content (client-side version)
+async function fetchLandingContentClient(slug: string): Promise<ProductSaaSLandingContent | null> {
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const res = await fetch(`${appUrl}/api/allset/landing-content?slug=${slug}`, {
-      cache: 'no-store',
-    })
+    // No NEXT_PUBLIC_APP_URL needed for client-side fetch to own API route
+    const res = await fetch(`/api/allset/landing-content?slug=${slug}`);
     if (!res.ok) {
       console.error(`Failed to fetch landing content (Main2) for slug ${slug}: ${res.status} ${res.statusText}`)
+      const errorBody = await res.text();
+      console.error(`Error body: ${errorBody}`);
       return null
     }
     const data = await res.json()
+    if (typeof data !== 'object' || data === null) {
+      console.error(`Fetched data is not an object for slug ${slug} (Main2). Received:`, data);
+      return null;
+    }
     if (data.pageType !== 'product' && data.pageType !== 'saas') {
-        console.warn(`Fetched content for Main2 (slug ${slug}) is not of type product/saas. PageType: ${data.pageType}`)
+        console.warn(`Fetched content for Main2 (slug ${slug}) is of pageType '${data.pageType}'.`)
     }
     return data as ProductSaaSLandingContent
   } catch (error) {
@@ -46,28 +48,31 @@ async function getLandingContentData(slug: string): Promise<ProductSaaSLandingCo
   }
 }
 
-
 const imageMap = {
-  landingDemoImage: landingDemoImage,
-  dashboardDemoImage: dashboardDemoImage,
-  // Add more images here if selectedFeature.image can reference other static imports
-}
+  landingDemoImage: landingDemoImage, // StaticImport
+  dashboardDemoImage: dashboardDemoImage, // StaticImport
+};
 
-// FeaturesSection needs to be a client component due to useState
-const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSectionType }) => {
-  'use client'
-  const [selectedFeature, setSelectedFeature] = useState(mainFeatures.items[0])
+const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSectionType | undefined }) => {
+  // This sub-component uses useState, so it's fine within Main2 (Client Component)
+  const [selectedFeature, setSelectedFeature] = useState(mainFeatures?.items?.[0]);
 
-  // Effect to update selectedFeature if mainFeatures.items itself changes or on initial load
   useEffect(() => {
     if (mainFeatures?.items?.length > 0) {
-      setSelectedFeature(mainFeatures.items[0]);
+      // Ensure selectedFeature is one of the current items, otherwise default to first.
+      const currentSelectionExists = mainFeatures.items.find(item => item.id === selectedFeature?.id);
+      if (!currentSelectionExists) {
+        setSelectedFeature(mainFeatures.items[0]);
+      } else if (!selectedFeature) { // If selectedFeature is null/undefined but items exist
+        setSelectedFeature(mainFeatures.items[0]);
+      }
+    } else if (mainFeatures?.items?.length === 0) { // If no items, clear selection
+        setSelectedFeature(undefined);
     }
-  }, [mainFeatures]);
+  }, [mainFeatures, selectedFeature]);
 
 
   if (!mainFeatures?.items?.length) return null;
-
 
   return (
     <section
@@ -105,9 +110,9 @@ const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSec
           </div>
           <div className="relative col-span-8 aspect-[16/9]">
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
-              {selectedFeature?.image && imageMap[selectedFeature.image] && (
+              {selectedFeature?.image && imageMap[selectedFeature.image as keyof typeof imageMap] && (
                 <Image
-                  src={imageMap[selectedFeature.image]}
+                  src={imageMap[selectedFeature.image as keyof typeof imageMap]}
                   alt={selectedFeature.title}
                   fill
                   className="object-cover transition-all duration-700 ease-in-out"
@@ -124,7 +129,8 @@ const FeaturesSectionClient = ({ mainFeatures }: { mainFeatures: MainFeaturesSec
   )
 }
 
-const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
+const HeroSection = ({ hero }: { hero: HeroSectionType | undefined }) => {
+  if (!hero) return null;
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -154,65 +160,15 @@ const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
           </div>
           <div className="relative mt-10 sm:mt-20 lg:col-span-5 lg:row-span-2 lg:mt-0 xl:col-span-6">
             <div className="absolute top-4 left-1/2 h-[1026px] w-[1026px] -translate-x-1/3 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] stroke-gray-300/70 sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0">
-              <svg
-                viewBox="0 0 1026 1026"
-                fill="none"
-                aria-hidden="true"
-                className="animate-spin-slow absolute inset-0 h-full w-full"
-              >
-                <path
-                  d="M1025 513c0 282.77-229.23 512-512 512S1 795.77 1 513 230.23 1 513 1s512 229.23 512 512Z"
-                  stroke="#D4D4D4"
-                  strokeOpacity="0.7"
-                ></path>
-                <path
-                  d="M513 1025C230.23 1025 1 795.77 1 513"
-                  stroke="url(#:S1:-gradient-1)"
-                  strokeLinecap="round"
-                ></path>
-                <defs>
-                  <linearGradient
-                    id=":S1:-gradient-1"
-                    x1="1"
-                    y1="513"
-                    x2="1"
-                    y2="1025"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#06b6d4"></stop>
-                    <stop offset="1" stopColor="#06b6d4" stopOpacity="0"></stop>
-                  </linearGradient>
-                </defs>
+              <svg viewBox="0 0 1026 1026" fill="none" aria-hidden="true" className="animate-spin-slow absolute inset-0 h-full w-full" >
+                <path d="M1025 513c0 282.77-229.23 512-512 512S1 795.77 1 513 230.23 1 513 1s512 229.23 512 512Z" stroke="#D4D4D4" strokeOpacity="0.7" ></path>
+                <path d="M513 1025C230.23 1025 1 795.77 1 513" stroke="url(#:S1:-gradient-1)" strokeLinecap="round" ></path>
+                <defs> <linearGradient id=":S1:-gradient-1" x1="1" y1="513" x2="1" y2="1025" gradientUnits="userSpaceOnUse" > <stop stopColor="#06b6d4"></stop> <stop offset="1" stopColor="#06b6d4" stopOpacity="0"></stop> </linearGradient> </defs>
               </svg>
-              <svg
-                viewBox="0 0 1026 1026"
-                fill="none"
-                aria-hidden="true"
-                className="animate-spin-reverse-slower absolute inset-0 h-full w-full"
-              >
-                <path
-                  d="M913 513c0 220.914-179.086 400-400 400S113 733.914 113 513s179.086-400 400-400 400 179.086 400 400Z"
-                  stroke="#D4D4D4"
-                  strokeOpacity="0.7"
-                ></path>
-                <path
-                  d="M913 513c0 220.914-179.086 400-400 400"
-                  stroke="url(#:S1:-gradient-2)"
-                  strokeLinecap="round"
-                ></path>
-                <defs>
-                  <linearGradient
-                    id=":S1:-gradient-2"
-                    x1="913"
-                    y1="513"
-                    x2="913"
-                    y2="913"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#06b6d4"></stop>
-                    <stop offset="1" stopColor="#06b6d4" stopOpacity="0"></stop>
-                  </linearGradient>
-                </defs>
+              <svg viewBox="0 0 1026 1026" fill="none" aria-hidden="true" className="animate-spin-reverse-slower absolute inset-0 h-full w-full" >
+                <path d="M913 513c0 220.914-179.086 400-400 400S113 733.914 113 513s179.086-400 400-400 400 179.086 400 400Z" stroke="#D4D4D4" strokeOpacity="0.7" ></path>
+                <path d="M913 513c0 220.914-179.086 400-400 400" stroke="url(#:S1:-gradient-2)" strokeLinecap="round" ></path>
+                <defs> <linearGradient id=":S1:-gradient-2" x1="913" y1="513" x2="913" y2="913" gradientUnits="userSpaceOnUse" > <stop stopColor="#06b6d4"></stop> <stop offset="1" stopColor="#06b6d4" stopOpacity="0"></stop> </linearGradient> </defs>
               </svg>
             </div>
             <div className="-mx-4 h-[448px] [mask-image:linear-gradient(to_bottom,white_60%,transparent)] px-9 sm:mx-0 lg:absolute lg:-inset-x-10 lg:-top-10 lg:-bottom-20 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32">
@@ -220,7 +176,7 @@ const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
                 <div className="relative">
                   <div className="w-full overflow-hidden rounded-lg shadow-xl">
                     <Image
-                      src={hero.image || landingDemoImage} // Fallback for hero image
+                      src={hero.image || landingDemoImage}
                       alt={hero.title || "AI Landing Page Generator Demo"}
                       width={1024}
                       height={576}
@@ -240,7 +196,8 @@ const HeroSection = ({ hero }: { hero: HeroSectionType }) => {
   )
 }
 
-const SecondaryFeaturesSection = ({ features }: { features: FeaturesSectionType }) => {
+const SecondaryFeaturesSection = ({ features }: { features: FeaturesSectionType | undefined }) => {
+  if (!features?.items || features.items.length === 0) return null;
   return (
     <section
       id="secondary-features"
@@ -255,28 +212,27 @@ const SecondaryFeaturesSection = ({ features }: { features: FeaturesSectionType 
           <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">{features.description}</p>
         </div>
         <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3">
-          {features.items.map((feature) => {
-            return (
-              <li key={feature.title} className="rounded-2xl border border-gray-200 p-8">
-                <FeatureIcon icon={feature.icon} />
-                <h3 className="mt-6 text-lg font-semibold text-slate-900 md:text-2xl dark:text-slate-200">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-slate-700 dark:text-slate-300">{feature.description}</p>
-              </li>
-            )
-          })}
+          {features.items.map((feature) => (
+            <li key={feature.title} className="rounded-2xl border border-gray-200 p-8">
+              <FeatureIcon icon={feature.icon} />
+              <h3 className="mt-6 text-lg font-semibold text-slate-900 md:text-2xl dark:text-slate-200">
+                {feature.title}
+              </h3>
+              <p className="mt-2 text-slate-700 dark:text-slate-300">{feature.description}</p>
+            </li>
+          ))}
         </ul>
       </div>
     </section>
   )
 }
 
-// CTASection needs to be a client component
-const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
-  'use client'
+const CTASectionClient = ({ cta }: { cta: CtaSectionType | undefined }) => {
+  // This sub-component uses useState/useEmailSubscription, so it's fine within Main2 (Client Component)
   const [email, setEmail] = useState('')
   const { subscribe, status, message } = useEmailSubscription()
+
+  if (!cta) return null;
 
   return (
     <section
@@ -284,37 +240,10 @@ const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
       className="relative overflow-hidden bg-gray-900 py-20 sm:py-28"
     >
       <div className="absolute top-1/2 left-20 -translate-y-1/2 sm:left-1/2 sm:-translate-x-1/2">
-        <svg
-          viewBox="0 0 558 558"
-          width="558"
-          height="558"
-          fill="none"
-          aria-hidden="true"
-          className="animate-spin-slower"
-        >
-          <defs>
-            <linearGradient
-              id=":S3:"
-              x1="79"
-              y1="16"
-              x2="105"
-              y2="237"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#fff"></stop>
-              <stop offset="1" stopColor="#fff" stopOpacity="0"></stop>
-            </linearGradient>
-          </defs>
-          <path
-            opacity=".2"
-            d="M1 279C1 125.465 125.465 1 279 1s278 124.465 278 278-124.465 278-278 278S1 432.535 1 279Z"
-            stroke="#fff"
-          ></path>
-          <path
-            d="M1 279C1 125.465 125.465 1 279 1"
-            stroke="url(#:S3:)"
-            strokeLinecap="round"
-          ></path>
+        <svg viewBox="0 0 558 558" width="558" height="558" fill="none" aria-hidden="true" className="animate-spin-slower" >
+          <defs> <linearGradient id=":S3:" x1="79" y1="16" x2="105" y2="237" gradientUnits="userSpaceOnUse" > <stop stopColor="#fff"></stop> <stop offset="1" stopColor="#fff" stopOpacity="0"></stop> </linearGradient> </defs>
+          <path opacity=".2" d="M1 279C1 125.465 125.465 1 279 1s278 124.465 278 278-124.465 278-278 278S1 432.535 1 279Z" stroke="#fff" ></path>
+          <path d="M1 279C1 125.465 125.465 1 279 1" stroke="url(#:S3:)" strokeLinecap="round" ></path>
         </svg>
       </div>
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -330,7 +259,7 @@ const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
                 onSubmit={async (e) => {
                   e.preventDefault()
                   await subscribe(email)
-                  // if (status === 'success') setEmail('') // Can cause issues
+                  // if (status === 'success') setEmail('')
                 }}
               >
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-center">
@@ -352,11 +281,7 @@ const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
                   </button>
                 </div>
                 <div className="mt-2 flex h-6 w-full items-center justify-center">
-                  {message && (
-                    <span className="text-primary-600 dark:text-primary-400 text-sm">
-                      {message}
-                    </span>
-                  )}
+                  {message && ( <span className="text-primary-600 dark:text-primary-400 text-sm"> {message} </span> )}
                 </div>
               </form>
             ) : (
@@ -374,7 +299,8 @@ const CTASectionClient = ({ cta }: { cta: CtaSectionType }) => {
   )
 }
 
-const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
+const PricingSection = ({ pricing }: { pricing: PricingSectionType | undefined }) => {
+  if (!pricing?.plans || pricing.plans.length === 0) return null;
   return (
     <section id="pricing" aria-label="Pricing plans" className="py-20 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -386,7 +312,6 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
           {pricing.plans.map((plan, index) => (
             <div key={plan.name}>
               {!plan.highlighted ? (
-                // First style for first two plans
                 <section className="flex flex-col overflow-hidden rounded-3xl bg-slate-50 p-6 shadow-lg shadow-gray-900/5 dark:bg-slate-800">
                   <h3 className="flex items-center text-lg font-semibold text-slate-900 md:text-2xl dark:text-slate-200">
                     <span className="ml-4">{plan.name}</span>
@@ -394,9 +319,7 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
                   <p className="relative mt-5 flex text-3xl tracking-tight text-slate-900 dark:text-slate-200">
                     {plan.price}
                   </p>
-                  <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
-                    {plan.description}
-                  </p>
+                  <p className="mt-3 text-sm text-slate-700 dark:text-slate-300"> {plan.description} </p>
                   <div className="order-last mt-6">
                     <ul className="-my-2 divide-y divide-gray-200 text-sm text-slate-700 dark:text-slate-300">
                       {plan.features.map((feature) => (
@@ -407,27 +330,19 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
                       ))}
                     </ul>
                   </div>
-                  <Link
-                    href={plan.cta.link}
-                    className="mt-6 inline-flex justify-center rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-900 active:bg-slate-800 active:text-white/80 dark:bg-slate-600"
-                  >
+                  <Link href={plan.cta.link} className="mt-6 inline-flex justify-center rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-900 active:bg-slate-800 active:text-white/80 dark:bg-slate-600" >
                     {plan.cta.text}
                   </Link>
                 </section>
               ) : (
-                // Second style for remaining plans
                 <section className="order-first flex flex-col overflow-hidden rounded-3xl bg-slate-900 p-6 shadow-lg shadow-gray-900/5 lg:order-none dark:bg-slate-300">
                   <h3 className="flex items-center text-lg font-semibold text-white md:text-2xl dark:text-slate-800">
                     <span className="ml-4">{plan.name}</span>
                   </h3>
                   <p className="relative mt-5 flex text-3xl tracking-tight text-white dark:text-slate-800">
-                    <span aria-hidden="false" className="transition duration-300">
-                      {plan.price}
-                    </span>
+                    <span aria-hidden="false" className="transition duration-300"> {plan.price} </span>
                   </p>
-                  <p className="mt-3 text-sm text-gray-300 dark:text-slate-800">
-                    {plan.description}
-                  </p>
+                  <p className="mt-3 text-sm text-gray-300 dark:text-slate-800"> {plan.description} </p>
                   <div className="order-last mt-6">
                     <ul className="-my-2 divide-y divide-gray-800 text-sm text-gray-300 dark:text-slate-600">
                       {plan.features.map((feature) => (
@@ -438,10 +353,7 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
                       ))}
                     </ul>
                   </div>
-                  <a // Changed to <a> as Link might not be needed if it's external or just #
-                    className="bg-primary-500 relative mt-6 inline-flex justify-center overflow-hidden rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-cyan-600 active:text-white/80 active:before:bg-transparent"
-                    href={plan.cta.link}
-                  >
+                  <a className="bg-primary-500 relative mt-6 inline-flex justify-center overflow-hidden rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-cyan-600 active:text-white/80 active:before:bg-transparent" href={plan.cta.link} >
                     {plan.cta.text}
                   </a>
                 </section>
@@ -454,8 +366,8 @@ const PricingSection = ({ pricing }: { pricing: PricingSectionType }) => {
   )
 }
 
-// GallerySection needs to be a client component
-const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType }) => {
+const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType | undefined }) => {
+  // This sub-component uses useState/useEffect, so it's fine within Main2 (Client Component)
   'use client'
   const [selectedImage, setSelectedImage] = useState<GalleryImageType | null>(null)
 
@@ -470,7 +382,7 @@ const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType }) => {
   }
 
   useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
+    const handleEscKey = (event: KeyboardEvent) => { // Added type for event
       if (event.key === 'Escape') {
         closeModal()
       }
@@ -483,101 +395,51 @@ const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType }) => {
     }
   }, [selectedImage])
 
+  if (!gallery?.images || gallery.images.length === 0) return null;
+
+
   return (
-    <section
-      id="gallery"
-      aria-labelledby="gallery-title"
-      className="border-t border-slate-200 py-20 sm:py-32 dark:border-slate-800"
-    >
+    <section id="gallery" aria-labelledby="gallery-title" className="border-t border-slate-200 py-20 sm:py-32 dark:border-slate-800" >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center lg:mx-0 lg:max-w-none">
-          <h2
-            id="gallery-title"
-            className="text-3xl font-medium tracking-tight text-slate-900 dark:text-slate-200"
-          >
+          <h2 id="gallery-title" className="text-3xl font-medium tracking-tight text-slate-900 dark:text-slate-200" >
             {gallery.title}
           </h2>
           <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">{gallery.description}</p>
         </div>
-
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 sm:grid-cols-2 lg:max-w-none lg:grid-cols-3">
           {gallery.images.map((image, index) => (
             <div
               key={index}
               className="group relative cursor-pointer overflow-hidden rounded-lg bg-slate-100 shadow-md transition-all hover:shadow-lg dark:bg-slate-800"
               onClick={() => openModal(image)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  openModal(image)
-                }
-              }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { openModal(image) } }}
               tabIndex={0}
               role="button"
               aria-label={`View ${image.alt} in large mode`}
             >
               <div className="aspect-[4/3] w-full overflow-hidden">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  width={600}
-                  height={450}
-                  className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                />
+                <Image src={image.src} alt={image.alt} width={600} height={450} className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105" />
               </div>
               <div className="p-4">
-                <p className="text-center font-medium text-slate-900 dark:text-slate-200">
-                  {image.caption}
-                </p>
+                <p className="text-center font-medium text-slate-900 dark:text-slate-200"> {image.caption} </p>
               </div>
             </div>
           ))}
         </div>
       </div>
-
       {selectedImage && (
-        <dialog
-          open
-          className="fixed inset-0 z-50 flex h-full w-full items-center justify-center bg-black/90 p-0 sm:p-4"
-          onClick={closeModal}
-          onKeyDown={(e) => e.key === 'Escape' && closeModal()}
-          aria-modal="true"
-          aria-labelledby="modal-title"
-        >
-          <article
-            className="relative flex h-full w-full flex-col bg-white sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg dark:bg-slate-800"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-2 right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-2xl font-bold text-black shadow-md transition-all hover:scale-110 hover:bg-gray-200 dark:bg-slate-700/90 dark:text-white dark:hover:bg-slate-600"
-              onClick={closeModal}
-              aria-label="Close modal"
-            >
-              &times;
-            </button>
+        <dialog open className="fixed inset-0 z-50 flex h-full w-full items-center justify-center bg-black/90 p-0 sm:p-4" onClick={closeModal} onKeyDown={(e) => e.key === 'Escape' && closeModal()} aria-modal="true" aria-labelledby="modal-title" >
+          <article className="relative flex h-full w-full flex-col bg-white sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg dark:bg-slate-800" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} >
+            <button className="absolute top-2 right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-2xl font-bold text-black shadow-md transition-all hover:scale-110 hover:bg-gray-200 dark:bg-slate-700/90 dark:text-white dark:hover:bg-slate-600" onClick={closeModal} aria-label="Close modal" > &times; </button>
             <div className="flex h-[calc(100%-60px)] w-full items-center justify-center overflow-auto p-0 sm:p-4">
               <div className="relative flex h-full w-full items-center justify-center">
-                <Image
-                  src={selectedImage.src}
-                  alt={selectedImage.alt}
-                  width={1200}
-                  height={900}
-                  className="h-auto w-full object-contain sm:max-h-full sm:w-auto"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                  }}
-                  priority
-                />
+                <Image src={selectedImage.src} alt={selectedImage.alt} width={1200} height={900} className="h-auto w-full object-contain sm:max-h-full sm:w-auto" style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', }} priority />
               </div>
             </div>
             {selectedImage.caption && (
               <div className="absolute right-0 bottom-0 left-0 border-t border-slate-200 bg-white/90 p-3 text-center backdrop-blur-sm sm:relative sm:bg-white sm:p-4 dark:border-slate-700 dark:bg-slate-800/90 sm:dark:bg-slate-800">
-                <p className="text-base font-medium text-slate-900 sm:text-lg dark:text-slate-200">
-                  {selectedImage.caption}
-                </p>
+                <p className="text-base font-medium text-slate-900 sm:text-lg dark:text-slate-200"> {selectedImage.caption} </p>
               </div>
             )}
           </article>
@@ -587,34 +449,24 @@ const GallerySectionClient = ({ gallery }: { gallery: GallerySectionType }) => {
   )
 }
 
-const FaqSection = ({ faqs }: { faqs: FaqsSectionType }) => {
+const FaqSection = ({ faqs }: { faqs: FaqsSectionType | undefined }) => {
+  if (!faqs?.questions || faqs.questions.length === 0) return null;
   return (
-    <section
-      id="faqs"
-      aria-labelledby="faqs-title"
-      className="border-t border-slate-200 py-20 sm:py-32 dark:border-slate-800"
-    >
+    <section id="faqs" aria-labelledby="faqs-title" className="border-t border-slate-200 py-20 sm:py-32 dark:border-slate-800" >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0">
-          <h2
-            id="faqs-title"
-            className="text-3xl font-medium tracking-tight text-slate-900 dark:text-slate-200"
-          >
+          <h2 id="faqs-title" className="text-3xl font-medium tracking-tight text-slate-900 dark:text-slate-200" >
             {faqs.title}
           </h2>
           <p className="mt-4 text-lg tracking-tight text-slate-700 dark:text-slate-200">
             {faqs.description?.split(' ').slice(0, -2).join(' ')}{' '}
-            <span className="text-primary-500">
-              {faqs.description?.split(' ').slice(-2).join(' ')}
-            </span>
+            <span className="text-primary-500"> {faqs.description?.split(' ').slice(-2).join(' ')} </span>
           </p>
         </div>
         <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3">
           {faqs.questions.map((faq, index) => (
             <li key={index}>
-              <h3 className="text-lg/6 font-semibold text-slate-900 dark:text-slate-200">
-                {faq.question}
-              </h3>
+              <h3 className="text-lg/6 font-semibold text-slate-900 dark:text-slate-200"> {faq.question} </h3>
               <p className="mt-4 text-sm text-slate-700 dark:text-slate-300">{faq.answer}</p>
             </li>
           ))}
@@ -624,34 +476,45 @@ const FaqSection = ({ faqs }: { faqs: FaqsSectionType }) => {
   )
 }
 
-import Main2ContactSection from './Main2ContactSection' // Assuming this is already a client component or can be
+// Main2 is now a Client Component
+export default function Main2({ posts }: { posts: any[] }) { // Added posts prop
+  const [landingContent, setLandingContent] = useState<ProductSaaSLandingContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-// Main2 becomes an async Server Component
-export default async function Main2() {
-  // Fetch landing content. Using "main-landing" for now, this could be specific like "main2-landing"
-  const landingContent = await getLandingContentData('main-landing');
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      const data = await fetchLandingContentClient('main-landing'); // or a specific slug for Main2
+      if (data) {
+        setLandingContent(data);
+      } else {
+        setError("Failed to load page content for Main2.");
+      }
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
 
-  if (!landingContent) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 xl:max-w-5xl xl:px-0">
-        <p className="text-lg text-red-500">Failed to load content for Main2 page. Please try again later.</p>
-      </div>
-    );
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center"><p>Loading Main2...</p></div>;
+  }
+  if (error || !landingContent) {
+    return <div className="flex h-screen items-center justify-center"><p className="text-red-500">Error: {error || "Could not load content."}</p></div>;
   }
 
-  // Destructure content safely, providing fallbacks if a section might be optional
   const { hero, mainFeatures, features, cta, gallery, pricing, faqs, contact } = landingContent;
 
   return (
     <>
       <main className="flex-auto">
-        {hero && <HeroSection hero={hero} />}
-        {mainFeatures && <FeaturesSectionClient mainFeatures={mainFeatures} />} {/* Use client version */}
-        {features && <SecondaryFeaturesSection features={features} />}
-        {cta && <CTASectionClient cta={cta} />} {/* Use client version */}
-        {gallery && <GallerySectionClient gallery={gallery} />} {/* Use client version */}
-        {pricing && <PricingSection pricing={pricing} />}
-        {faqs && <FaqSection faqs={faqs} />}
+        <HeroSection hero={hero} />
+        <FeaturesSectionClient mainFeatures={mainFeatures} />
+        <SecondaryFeaturesSection features={features} />
+        <CTASectionClient cta={cta} />
+        <GallerySectionClient gallery={gallery} />
+        <PricingSection pricing={pricing} />
+        <FaqSection faqs={faqs} />
         {contact && <Main2ContactSection contact={contact} />}
       </main>
     </>
