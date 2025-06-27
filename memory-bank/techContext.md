@@ -31,6 +31,7 @@
 - La solución escalable y compatible con Next.js serverless es migrar la persistencia a Supabase.
 - Supabase permite almacenar configuraciones globales, preferencias de usuario y cualquier dato crítico de forma segura y escalable.
 - El endpoint `/api/allset/templates/update` y la lógica de configuración migraron a Supabase, eliminando dependencias de SQLite o archivos JSON locales para producción.
+- **Landing Page Content**: Dynamic content for landing pages (previously from `data/landingContent.json`) is now stored in Supabase tables (`landing_pages` and `page_content`). The content editor at `/allset/landing-content` and relevant APIs now interact with these tables.
 
 ### Microbatches de integración Supabase
 

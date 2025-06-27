@@ -1,6 +1,32 @@
 # Changelog
 
-## 2025-06-25 (Latest)
+## [Current Date, e.g., 2025-07-01] (Latest)
+
+### 🚀 FEATURE: Dynamic Landing Page Content via Supabase
+
+- **Data Persistence**: Migrated all landing page content (hero, features, CTAs, pricing, testimonials, FAQs, etc.) from the static `data/landingContent.json` file to a dynamic Supabase backend.
+  - Created new Supabase tables: `landing_pages` (for page metadata like slug, page_type) and `page_content` (for storing individual page section data as JSONB).
+- **Data Migration Script**: Developed `scripts/migrateLandingContent.js` to perform a one-time migration of existing JSON content into the new Supabase tables. Added `db:migrate-landing-content` npm script.
+- **API Refactoring**:
+  - `/api/allset/landing-content`:
+    - `GET`: Now fetches and reconstructs landing page content from Supabase based on a page slug (defaults to "main-landing").
+    - `POST`: Now saves the entire landing page content to Supabase by intelligently upserting data into the `page_content` table for each section and updating the `landing_pages` table if `pageType` changes.
+  - `/api/allset/generate-content`: AI-generated content is now saved directly to Supabase.
+  - `/api/allset/generate-blog-titles`: Now fetches landing page context from Supabase instead of the local JSON file.
+  - API routes involved set to `dynamic = 'force-dynamic'` for Vercel compatibility.
+- **Frontend Dynamic Content**:
+  - Page templates (`app/Main.tsx` through `app/Main6.tsx`) converted to async Server Components. They now fetch content dynamically from the `/api/allset/landing-content` API instead of using static JSON imports.
+  - Shared components like `components/Header.tsx` (via `app/layout.tsx`) now receive landing page content as props, allowing for dynamic elements (e.g., navigation links based on available content sections).
+  - Client-side interactive parts within these templates have been preserved using `'use client'` directives and prop drilling.
+- **Content Editor (`/allset/landing-content`)**:
+  - Now loads data from and saves data to Supabase via the refactored API.
+  - Issues with page type display (for the default "main-landing" page) and reset functionality are expected to be resolved due to the consistent Supabase backend.
+- **Vercel Compatibility**: This migration ensures that landing page content is fully dynamic and manageable in a serverless environment like Vercel, removing reliance on a read-only filesystem.
+- **Cleanup**: Deleted the `data/landingContent.json` file.
+
+---
+
+## 2025-06-25
 
 ### Vercel Deployment Error Fixes
 

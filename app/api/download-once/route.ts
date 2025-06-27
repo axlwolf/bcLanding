@@ -4,7 +4,7 @@ import path from 'path'
 import siteMetadata from '@/data/siteMetadata'
 
 // Store a simple download log in memory (for demo; replace with DB in production)
-const DOWNLOAD_LOG_PATH = path.join(process.cwd(), 'data', 'download-log.json')
+const DOWNLOAD_LOG_PATH = path.join(process.cwd(), 'data', '_download-log.json') // Updated path
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
 
 async function hasDownloaded(downloadKey: string, userId: string): Promise<boolean> {

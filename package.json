@@ -12,7 +12,8 @@
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
     "prepare": "husky",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md,mdx}\"",
-    "verify-supabase": "node scripts/verify-supabase.mjs"
+    "verify-supabase": "node scripts/verify-supabase.mjs",
+    "db:migrate-landing-content": "node scripts/migrateLandingContent.js"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
@@ -79,6 +80,7 @@
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.5.0",
     "eslint": "^9.29.0",
     "eslint-config-next": "15.3.4",
     "eslint-config-prettier": "^10.1.5",

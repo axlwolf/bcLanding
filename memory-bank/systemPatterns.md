@@ -3,6 +3,7 @@
 ## Architecture Overview
 
 ### Core Framework: Astro + React Islands
+<!-- TODO: This section is outdated. Project has migrated to Next.js (App Router) as per techContext.md and progress.md -->
 
 ```
 Static Generation (Astro)
@@ -233,7 +234,24 @@ GSAP (GreenSock Animation Platform) is the primary library for complex animation
 
 ## Content Management Patterns
 
-### Astro Content Collections
+### Dynamic Landing Page Content (Supabase)
+
+- **Source of Truth**: Landing page content (hero, features, pricing, testimonials, FAQs, CTAs, etc.) is stored in Supabase.
+- **Database Structure**:
+    - `landing_pages` table: Stores metadata for each page (e.g., slug, page_type, name).
+    - `page_content` table: Stores content for individual sections of a page as JSONB objects, linked to a `landing_pages` entry. This allows flexible, dynamic section structures.
+- **Data Flow**:
+    - Page templates (e.g., `app/Main*.tsx`) are async Server Components that fetch their content from an API endpoint (`/api/allset/landing-content`).
+    - The API endpoint queries Supabase based on a page slug (e.g., "main-landing") and reconstructs the full page content JSON.
+    - The Content Editor (`/allset/landing-content`) also uses this API to load and save content.
+- **Benefits**:
+    - Content is dynamic and editable without code changes or redeployments.
+    - Vercel-compatible (no reliance on local filesystem for content).
+    - Supports multiple page configurations and types.
+    - Centralized content management via Supabase and the editor.
+
+### Astro Content Collections (For Blog/Static Content)
+<!-- TODO: Verify if Astro Content Collections are still in use for blog or if blog content also moved or is planned to move to Supabase/CMS -->
 
 ```typescript
 // Type-safe content management
@@ -290,7 +308,19 @@ const blogSchema = defineCollection({
 
 ## Data Flow Patterns
 
-### Current (Client-Side)
+### Current (Landing Page Content - Supabase)
+
+- **Content Fetch for Display**:
+    - `Next.js Page (Server Component e.g. app/Main.tsx)` → `fetch('/api/allset/landing-content?slug=...')` → `API Route` → `Supabase Client (select from landing_pages & page_content)` → `Reconstructed JSON content` → `Props to Page/Components`.
+- **Content Editor Interaction**:
+    - `Editor UI (/allset/landing-content)` → `fetch (GET /api/allset/landing-content)` → `API Route` → `Supabase` → `Editor State`.
+    - `Editor UI (Save Action)` → `fetch (POST /api/allset/landing-content)` with full JSON body → `API Route` → `Supabase Client (upsert to page_content, update landing_pages)` → `Success/Error Response`.
+- **AI Content Generation**:
+    - `Editor UI (Generate Action)` → `fetch (POST /api/allset/generate-content)` → `API Route` (fetches context if needed from Supabase, calls LLM) → `Saves generated content to Supabase (via internal logic similar to POST landing-content)` → `Returns generated content to Editor`.
+
+
+### Legacy / Other Flows (Client-Side - Needs Review)
+<!-- TODO: Review if these client-side patterns are still accurate or if they also involve Supabase now. -->
 
 ```
 User Interaction → Component State → UI Update

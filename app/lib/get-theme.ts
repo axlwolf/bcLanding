@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 // Path to the theme settings file
-const themeFilePath = path.join(process.cwd(), 'data', 'theme.json')
+const themeFilePath = path.join(process.cwd(), 'data', '_theme.json') // Updated path
 
 // Default theme settings
 const defaultTheme = {
